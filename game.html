@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Socio Verse – SMA N 2 Yogyakarta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#23324a;--mint:#3fbf8a;--mint-d:#2a9a6c;--sun:#ffc94a;--rose:#e8626b;--paper:#fffdf7;--sky:#cfeaff}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--sky)}
+  canvas{display:block}
+  .hidden{display:none!important}
+
+  /* Papan skor */
+  #hud{position:fixed;top:12px;right:12px;display:flex;gap:10px;z-index:5}
+  .chip{background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:8px 14px;box-shadow:0 4px 0 var(--ink);font-weight:700;min-width:96px;text-align:center}
+  .chip small{display:block;font-size:11px;font-weight:600;opacity:.7}
+  .chip b{font-size:22px}
+  #title{position:fixed;top:12px;left:12px;z-index:5;background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:8px 14px;box-shadow:0 4px 0 var(--ink);max-width:min(360px,60vw)}
+  #title b{display:block;font-size:16px}
+  #title span{font-size:12px;opacity:.75}
+  #mini{position:fixed;left:12px;bottom:12px;z-index:5;width:140px;height:140px;background:rgba(255,253,247,.92);border:3px solid var(--ink);border-radius:14px}
+  #hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(35,50,74,.88);color:#fff;border-radius:999px;padding:8px 18px;font-size:13px;z-index:5;white-space:nowrap}
+  #area{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);font-weight:700;font-size:15px;z-index:5;background:var(--sun);border:3px solid var(--ink);border-radius:12px;padding:4px 14px;transition:opacity .3s}
+
+  /* Dialog */
+  #dlg{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:16px;z-index:10;background:rgba(35,50,74,.28)}
+  .card{width:min(640px,100%);max-height:92vh;overflow:auto;background:var(--paper);border:4px solid var(--ink);border-radius:22px;box-shadow:0 8px 0 var(--ink);padding:18px 20px;animation:pop .22s ease-out}
+  @keyframes pop{from{transform:translateY(24px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+  .who{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  #dIcon{width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);display:grid;place-items:center;font-size:24px}
+  .who b{font-size:18px;display:block}
+  .who small{font-size:13px;opacity:.75}
+  #dNarasi{margin:8px 0 12px;line-height:1.5;background:#fff3cf;border-left:6px solid var(--sun);padding:10px 12px;border-radius:8px;font-size:15px}
+  #dQ{margin:0 0 10px;font-size:17px;line-height:1.35}
+  .opt{display:block;width:100%;text-align:left;margin:7px 0;padding:11px 14px;font:inherit;font-size:15px;color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:14px;cursor:pointer;transition:transform .08s}
+  .opt:hover:not(:disabled){transform:translateX(4px);background:#eef7ff}
+  .opt:focus-visible,.btn:focus-visible{outline:4px solid var(--sun);outline-offset:2px}
+  .opt.wrong{background:#ffe1e3;border-color:var(--rose);text-decoration:line-through;opacity:.7;animation:shake .3s}
+  .opt.right{background:#d9f7e8;border-color:var(--mint-d)}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  #dFb{min-height:22px;margin:8px 0;font-weight:700}
+  #dFb.ok{color:var(--mint-d)} #dFb.no{color:var(--rose)}
+  .btn{font:inherit;font-weight:700;font-size:15px;padding:10px 18px;border:3px solid var(--ink);border-radius:14px;cursor:pointer;background:var(--mint);color:#fff;box-shadow:0 3px 0 var(--ink)}
+  .btn.ghost{background:#fff;color:var(--ink);margin-left:6px}
+  #flash{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle,rgba(63,191,138,.55),rgba(63,191,138,0) 70%);opacity:0;z-index:9}
+  #flash.on{animation:fl .9s ease-out}
+  @keyframes fl{0%{opacity:1}100%{opacity:0}}
+  #end{position:fixed;inset:0;z-index:20;background:rgba(35,50,74,.7);display:flex;align-items:center;justify-content:center;padding:16px}
+  #end .card{text-align:center}
+  button.chip{font:inherit;color:var(--ink);cursor:pointer}
+  button.chip b{font-size:14px}
+  #start{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(35,50,74,.62)}
+  #start .card{text-align:center;max-width:460px}
+  #start label{display:block;text-align:left;font-weight:700;margin-top:12px}
+  #start input{display:block;width:100%;margin-top:4px;padding:10px 12px;font:inherit;color:var(--ink);border:3px solid var(--ink);border-radius:12px;background:#fff}
+  #startErr{min-height:22px;margin:8px 0;color:var(--rose);font-weight:700}
+  .result{border:3px dashed var(--ink);border-radius:16px;padding:12px 14px;margin:12px 0;background:#fff;text-align:left}
+  .result .rhead{font-weight:700;text-align:center}
+  .result dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:10px 0 0}
+  .result dt{opacity:.75}.result dd{margin:0;font-weight:700;text-align:right}
+  #rMsg{font-size:14px;min-height:20px}
+  @media (max-width:520px){#mini{width:100px;height:100px;bottom:70px}#hint{white-space:normal;width:90%;text-align:center;border-radius:14px}.chip{min-width:70px;padding:6px 8px}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ===== Tema baru: kota low-poly, tombol "permen" ===== */
+  :root{--ink:#2b1a52;--mint:#22c55e;--mint-d:#15803d;--sun:#fbbf24;--rose:#f43f5e;--paper:#fffaff}
+  body{font-family:"Nunito","Trebuchet MS","Segoe UI",system-ui,sans-serif}
+  body:not(.playing) #hud,body:not(.playing) #title,body:not(.playing) #hint,body:not(.playing) #area,body:not(.playing) #mini{display:none}
+  .chip,#title{background:rgba(43,26,82,.82);color:#fff;border:2px solid rgba(255,255,255,.28);box-shadow:0 4px 0 rgba(0,0,0,.35);backdrop-filter:blur(4px)}
+  #hint{background:rgba(43,26,82,.88);font-weight:700}
+  #area{background:#f9a8d4;color:#2b1a52;border:0;box-shadow:0 3px 0 #be185d}
+  #mini{background:rgba(43,26,82,.7);border:2px solid rgba(255,255,255,.3)}
+  .btn{background:#22c55e;color:#fff;border:0;border-radius:16px;padding:13px 22px;font-weight:900;font-size:17px;box-shadow:0 5px 0 #15803d}
+  .btn:active{transform:translateY(3px);box-shadow:0 2px 0 #15803d}
+  .btn.ghost{background:#fff;color:var(--ink);box-shadow:0 5px 0 #cbbfe0}
+  .btn.ghost:active{box-shadow:0 2px 0 #cbbfe0}
+  .card{border-radius:26px}
+  #start{background:linear-gradient(90deg,rgba(28,14,58,.86) 0%,rgba(28,14,58,.5) 55%,rgba(28,14,58,.08) 100%);align-items:center;justify-content:flex-start;padding:0 6vw;overflow:auto}
+  .hero-wrap{max-width:560px;color:#fff;padding:24px 0}
+  .brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900}
+  .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(#f9a8d4,#ec4899);box-shadow:0 4px 0 #9d174d;position:relative}
+  .logo::after{content:"";position:absolute;inset:8px;border-radius:5px;background:#fff}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 8px}
+  .chips span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:6px 12px;font-weight:800;font-size:13px}
+  .hero{margin:6px 0;line-height:.95;font-weight:900;font-size:clamp(46px,10vw,96px);letter-spacing:-1px}
+  .hero span{display:block}
+  .hero .l1{color:#fff;text-shadow:0 3px 0 #f9a8d4,0 6px 0 #f472b6,0 9px 0 #db2777,0 12px 0 #be185d,0 20px 26px rgba(0,0,0,.4)}
+  .hero .l2{color:#f9a8d4;text-shadow:0 3px 0 #db2777,0 6px 0 #be185d,0 9px 0 #9d174d,0 12px 0 #831843,0 20px 26px rgba(0,0,0,.4)}
+  .sub{font-size:clamp(18px,2.6vw,24px);font-weight:900;margin:20px 0 6px}
+  .lead{font-size:16px;line-height:1.55;max-width:520px;margin:0 0 16px;font-weight:700}
+  .panel{background:rgba(70,30,110,.55);border:2px solid rgba(249,168,212,.65);border-radius:20px;padding:14px 16px;backdrop-filter:blur(4px);max-width:520px}
+  .panel .row{display:flex;gap:10px;margin:10px 0 0;flex-wrap:wrap}
+  #start .panel input{flex:1 1 180px;width:auto;margin:0;padding:12px 14px;font-weight:800;color:#fff;background:rgba(255,255,255,.1);border:2px solid rgba(167,139,250,.8);border-radius:14px}
+  #start .panel input::placeholder{color:rgba(255,255,255,.55)}
+  #start .panel input:focus-visible{outline:3px solid #f9a8d4}
+  #startErr{color:#fda4af;min-height:22px;margin:8px 0}
+  #btnMulai{font-size:19px}
+  .keys{font-size:13px;opacity:.8;font-weight:700}
+  @media(max-width:700px){#start{background:rgba(28,14,58,.8)}}
+</style>
+</head>
+<body>
+
+<div id="title"><b>Socio Verse</b><span>SMA N 2 Yogyakarta · Sosiologi X · Stratifikasi Sosial, Status, dan Mobilitas Sosial</span></div>
+<div id="hud">
+  <div class="chip"><small>Skor</small><b id="score">0</b></div>
+  <div class="chip"><small>Pos selesai</small><b id="badges">0/20</b></div>
+  <button class="chip" id="btnHasil"><small>Selesai?</small><b>Lihat hasil</b></button>
+</div>
+<div id="area">Halaman sekolah</div>
+<div id="hint">Gerak: W A S D / Panah · Datangi Pos 1–20 (urutan bebas) · Tombol “Lihat hasil” di kanan atas</div>
+
+<canvas id="mini" width="140" height="140" aria-label="Peta pos"></canvas>
+<div id="flash"></div>
+
+<div id="dlg" class="hidden" role="dialog" aria-modal="true">
+  <div class="card">
+    <div class="who"><div id="dIcon"></div><div><b id="dName"></b><small id="dStatus"></small></div></div>
+    <div id="dNarasi"></div>
+    <h3 id="dQ"></h3>
+    <div id="dOpts"></div>
+    <div id="dFb" aria-live="polite"></div>
+    <button class="btn hidden" id="dNext">Lanjutkan</button>
+    <button class="btn ghost" id="dClose">Nanti saja</button>
+  </div>
+</div>
+
+<div id="end" class="hidden">
+  <div class="card">
+    <h2 id="rTitle">Hasil</h2>
+    <div class="result">
+      <div class="rhead">SMA N 2 Yogyakarta · Sosiologi X</div>
+      <dl>
+        <dt>Nama</dt><dd id="rNama"></dd>
+        <dt>Kelas</dt><dd id="rKelas"></dd>
+        <dt>Skor</dt><dd id="rSkor"></dd>
+        <dt>Pos selesai</dt><dd id="rPos"></dd>
+        <dt>Benar di percobaan pertama</dt><dd id="rLangsung"></dd>
+        <dt>Jawaban salah</dt><dd id="rSalah"></dd>
+        <dt>Waktu bermain</dt><dd id="rWaktu"></dd>
+        <dt>Tanggal</dt><dd id="rTanggal"></dd>
+      </dl>
+    </div>
+    <p id="rMsg" aria-live="polite">Foto atau tangkapan layar kartu ini, lalu kirim ke guru.</p>
+    <button class="btn" id="btnSalin">Salin hasil</button>
+    <button class="btn ghost" id="btnTutup">Kembali ke game</button>
+    <button class="btn ghost" onclick="location.reload()">Main lagi</button>
+  </div>
+</div>
+
+<div id="start">
+  <div class="hero-wrap">
+    <div class="brand"><span class="logo"></span><b>Game 20 Pos</b></div>
+    <div class="chips"><span>🎮 Game 3D</span><span>📘 Sosiologi X</span><span>💻 Laptop</span></div>
+    <h1 class="hero"><span class="l1">SOCIO</span><span class="l2">VERSE</span></h1>
+    <h2 class="sub">Jelajahi Sekolah, Taklukkan Sosiologi</h2>
+    <p class="lead">Dunia 3D mini SMA N 2 Yogyakarta. Datangi 20 pos, jawab soal stratifikasi dan mobilitas sosial, lalu kumpulkan skor terbaikmu.</p>
+    <div class="panel">
+      <b>Isi data dulu, ya</b>
+      <div class="row">
+        <input id="inNama" maxlength="30" autocomplete="off" placeholder="Nama lengkap" aria-label="Nama lengkap">
+        <input id="inKelas" maxlength="10" autocomplete="off" placeholder="Kelas, mis. X-3" aria-label="Kelas">
+      </div>
+      <div id="startErr" aria-live="polite"></div>
+      <button class="btn" id="btnMulai">▶ Main Sekarang</button>
+    </div>
+    <p class="keys">Gerak: W A S D atau tombol panah</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* =====================================================================
+   ★ BAGIAN YANG BISA KAMU EDIT: SOAL & POSISI POS ★
+   Ada 20 pos. Urutan soal di SOAL = nomor pos (soal pertama = Pos 1, dst).
+   Struktur satu soal:
+     pertanyaan : teks soal (boleh berisi cerita/ilustrasi)
+     pilihan    : daftar jawaban (otomatis diberi huruf A, B, C, ...)
+     benar      : nomor jawaban benar, dimulai dari 0 (A=0, B=1, C=2, D=3, E=4)
+     penjelasan : ditampilkan setelah jawaban benar (boleh dikosongkan "")
+     narasi     : (opsional) cerita pengantar tambahan di atas soal
+   ===================================================================== */
+const SOAL = [
+  { // Pos 1
+    pertanyaan: "Terjadinya stratifikasi sosial dalam masyarakat disebabkan oleh ….",
+    pilihan: ["Adanya sesuatu yg dihargai lebih", "Adanya perbedaan suku bangsa dan agama", "Adanya perbedaan hak dan kewajiban", "Pentingnya strata sosial dalam hubungan sosial", "Banyaknya individu yg menjadi anggota masyarakat"],
+    benar: 0,
+    penjelasan: "Stratifikasi muncul karena ada sesuatu yang dihargai lebih, misalnya kekayaan, ilmu, kekuasaan, atau kehormatan." },
+  { // Pos 2
+    pertanyaan: "Mala anak seorang kuli bangunan. Meski demikian, Mala tidak malu dan terus semangat untuk belajar. Karena berkat kegigihan, dan ketekunannya, Mala berhasil mendapatkan beasiswa pendidikan untuk kuliah. Kini ia sudah menjadi dokter gigi di kliniknya sendiri. Dari ilustrasi tersebut, usaha Mala dalam melakukan perpindahan status termasuk jenis stratifikasi sosial yg sifatnya ….",
+    pilihan: ["Kasta", "Terbuka", "Campuran", "Tertutup", "Oligarki"],
+    benar: 1,
+    penjelasan: "Mala naik status lewat usahanya sendiri; ini ciri stratifikasi terbuka." },
+  { // Pos 3
+    pertanyaan: "Stratification berasal dari kata stratum yg artinya ….",
+    pilihan: ["Kekuasaan", "Ukuran", "Dominasi", "Lapisan", "Perbedaan"],
+    benar: 3,
+    penjelasan: "Stratum berarti lapisan, jadi stratification berarti pelapisan." },
+  { // Pos 4
+    pertanyaan: "Garis-garis pemisah antarlapisan sifatnya fleksibel dan tidak kaku merupakan ciri dari stratifikasi sosial kriteria politik pada tipe ….",
+    pilihan: ["Kasta", "Oligarki", "Monarki", "Feodal", "Demokratis"],
+    benar: 4,
+    penjelasan: "Pada tipe demokratis, batas antarlapisan fleksibel." },
+  { // Pos 5
+    pertanyaan: "Stratifikasi sosial berdasarkan sistem kasta bersifat tertutup sebab ….",
+    pilihan: ["Sistem kasta hanya dikenal di negara India", "Masyarakat Bali sebagian besar memeluk agama Hindu", "Kasta diperoleh melalui keturunan dan berlaku seumur hidup", "Bentuk perkawinan dalam masyarakat Hindu bersifat eksogami", "Sejak India merdeka pelaksanaan kasta cenderung lunak"],
+    benar: 2,
+    penjelasan: "Kasta didapat dari keturunan dan melekat seumur hidup, sehingga sulit berpindah." },
+  { // Pos 6
+    pertanyaan: "Raden terlahir dari keluarga bangsawan. Oleh karenanya, ia dihormati masyarakat sekitar. Gelar bangsawan pun ia peroleh tanpa perlu bersusah payah. Hal ini menunjukkan contoh ….",
+    pilihan: ["Assigned status", "Achieved status", "Ascribed status", "Close social stratification", "Social sinking"],
+    benar: 2,
+    penjelasan: "Gelar bangsawan didapat dari keturunan tanpa usaha, jadi termasuk ascribed status." },
+  { // Pos 7
+    pertanyaan: "Mobilitas dapat terjadi antardua generasi atau lebih, misalnya kakek/nenek ke ayah/ibu, ayah/ibu ke generasi anak, generasi cucu, dst. Mobilitas yg demikian ini ditandai dengan perkembangan taraf hidup, baik naik atau turun dalam suatu generasi. Penjelasan tersebut menunjukkan pengertian mobilitas ….",
+    pilihan: ["Intragenerasi", "Antargenerasi", "Transmigrasai", "Horizontal", "Lateral"],
+    benar: 1,
+    penjelasan: "Mobilitas yang melibatkan dua generasi atau lebih disebut antargenerasi." },
+  { // Pos 8
+    pertanyaan: "Mobilitas yg dilakukan dari suatu kelompok sosial ke kelompok sosial lainnya yg sederajat disebut mobilitas sosial ….",
+    pilihan: ["Horizontal", "Vertikal", "Lateral", "Intragenerasi", "Antargenerasi"],
+    benar: 0,
+    penjelasan: "Perpindahan ke kelompok sosial yang sederajat disebut mobilitas horizontal." },
+  { // Pos 9
+    pertanyaan: "Contoh mobilitas vertikal naik adalah ….",
+    pilihan: ["Seorang manajer dipecat karena melakukan kesalahan fatal", "Seorang petani beralih profesi menjadi buruh pabrik", "Pak Burhan pindah rumah dari Solo ke Semarang", "Seorang direktur perusahaan ternama tiba-tiba saja bangkrut karena krisis ekonomi perusahaannya", "Anak dari keluarga tidak mampu yang kemudian dipilih menjadi seorang menteri karena kinerjanya"],
+    benar: 4,
+    penjelasan: "Anak dari keluarga tidak mampu yang menjadi menteri naik ke lapisan yang lebih tinggi." },
+  { // Pos 10
+    pertanyaan: "Pak Damar awalnya pegawai biasa. Namun karena kemampuannya, ia dipromosikan menjadi direktur. Ini menunjukkan mobilitas sosial ….",
+    pilihan: ["Vertikal naik", "Vertikal turun", "Lateral", "Horizontal", "Antargenerasi"],
+    benar: 0,
+    penjelasan: "Dari pegawai biasa menjadi direktur berarti naik lapisan: vertikal naik." },
+  { // Pos 11
+    pertanyaan: "Pengelompokan atau penggolongan seseorang atau kelompok dalam masyarakat secara vertikal dinamakan ….",
+    pilihan: ["Interaksi sosial", "Sistem sosial", "Stratifikasi sosial", "Diferensiasi sosial", "Lapisan sosial"],
+    benar: 2,
+    penjelasan: "Pengelompokan masyarakat secara vertikal ke dalam lapisan-lapisan disebut stratifikasi sosial." },
+  { // Pos 12
+    pertanyaan: "Beni berasal dari Bali. Ia berkasta Ksatria. Kini ia sedang berkuliah di Yogyakarta. Di daerah asalnya ia sanggat disegani, namun saat di Yogyakarta ia tidak mendapat perlakuan khusus dari orang lain karena di Yogyakarta tidak mengenal sistem kasta di masyarakat. Ini menunjukkan contoh stratifikasi sosial ….",
+    pilihan: ["Terbuka", "Tertutup", "Campuran", "Oligarki", "Kasta"],
+    benar: 2,
+    penjelasan: "Di Bali kasta berlaku (tertutup), di Yogyakarta tidak (terbuka). Gabungan keduanya disebut campuran." },
+  { // Pos 13
+    pertanyaan: "Contoh status sosial yg didapat secara otomatis adalah ….",
+    pilihan: ["Seorang murid sangat rajin belajar sehingga ia naik kelas", "Anak dari seorang Brahmana akan memiliki kasta Brahmana", "Pedagang sayur keliling sekarang membuka toko sayuran", "Seorang camat karena prestasinya diangkat menjadi walikota", "Seorang murid karena kemampuan leadershipnya dijadikan ketua kelas"],
+    benar: 1,
+    penjelasan: "Status karena keturunan didapat otomatis (ascribed status)." },
+  { // Pos 14
+    pertanyaan: "Pada pelapisan sosial tipe demokratis, pelapisan sosial paling atas diduduki oleh ….",
+    pilihan: ["Raja (penguasa)", "Bangsawan", "Ulama", "Orang kaya", "Elit politik"],
+    benar: 4,
+    penjelasan: "Pada tipe demokratis, lapisan atas ditempati elit politik." },
+  { // Pos 15
+    pertanyaan: "Sifat stratifikasi sosial, antara lain ….",
+    pilihan: ["Terbuka, tertutup, campuran", "Terbuka, tertutup, variasi", "Terbuka, variasi, kewajiban", "Keharusan, kewajiban, sukarela", "Paksaan, sukarela, kewajiban"],
+    benar: 0,
+    penjelasan: "Sifat stratifikasi sosial ada tiga: terbuka, tertutup, dan campuran." },
+  { // Pos 16
+    pertanyaan: "Pada prinsipnya, status seseorang dapat diperoleh dengan cara-cara berikut ….",
+    pilihan: ["Subjektif, objektif, otomatis", "Otomatis, ada usaha, subjektif", "Konflik, simbol, assigned", "Ascribed, otomatis, assigned", "Ascribed, achieved, assigned"],
+    benar: 4,
+    penjelasan: "Status diperoleh melalui tiga cara: ascribed, achieved, dan assigned." },
+  { // Pos 17
+    pertanyaan: "Beberapa contoh stratifikasi sosial yg bersifat tertutup adalah ….",
+    pilihan: ["Kasta, pangkat, pendidikan", "Kasta, sistem feodal, politik apartheid", "Sistem pendidikan, sistem ekonomi", "Kasta, keturunan, golongan usia", "Kasta, golongan usia, pendidikan"],
+    benar: 1,
+    penjelasan: "Kasta, sistem feodal, dan politik apartheid sama-sama membatasi perpindahan status." },
+  { // Pos 18
+    pertanyaan: "Berikut termasuk contoh achieved status adalah ….",
+    pilihan: ["Lina belajar dengan rajin hingga akhirnya menjadi arsitek", "Ir. Soekarno mendapat julukan Bapak Proklamator", "Pak Hasyim rajin melestarikan alam sehingga mendapat penghargaan kalpataru", "Pak Dion lahir dari keluarga berdarah suku Jawa", "Raden mendapat julukan bangsawan karena keturunan ningrat"],
+    benar: 0,
+    penjelasan: "Menjadi arsitek lewat belajar rajin adalah status hasil usaha (achieved status)." },
+  { // Pos 19
+    pertanyaan: "Rido adalah seorang pegawai pabrik plastik. Ia sudah bekerja di tempat tersebut selama 20 tahun. Karena kinerjanya yg ulet, rajin, dan tekun, akhirnya atasannya mengangkatnya menjadi supervisor. Rido pun mendapatkan fasilitas khusus karena jabatannya. Berdasarkan narasi diatas, pernyataan yg tepat adalah ….",
+    pilihan: ["Mobilitas yg dilakukan Rido termasuk contoh mobilitas intragenerasi", "Saluran mobilitas sosial yg digunakan Rido melalui lembaga pendidikan", "Mobilitas yg dilakukan Rido disebut mobilitas lateral", "Rido telah melakukan mobilitas vertikal naik", "Diangkatnya Rido menjadi supervisor termasuk mobilitas antargenerasi"],
+    benar: 3,
+    penjelasan: "Rido naik jabatan menjadi supervisor, berarti ia melakukan mobilitas vertikal naik." },
+  { // Pos 20
+    pertanyaan: "Ki Hajar Dewantara adalah pahlawan yg berjasa di bidang pendidikan. Beliau merupakan pelopor pendidikan bagi masyarakat pribumi ketika Indonesia masih dalam masa penjajahan kolonial Belanda. Berkat jasa-jasanya Ki Hajar Dewantara diberikan gelar sebagai Bapak Pendidikan Indonesia. Gelar yg diperoleh termasuk contoh ….",
+    pilihan: ["Assigned status", "Achieved status", "Ascribed status", "Social sinking", "Social climbing"],
+    benar: 0,
+    penjelasan: "Gelar Bapak Pendidikan Indonesia diberikan oleh masyarakat atau negara atas jasa-jasanya, jadi termasuk assigned status." }
+];
+
+/* Posisi tiap pos di peta: [x, z]. Urutannya sama dengan nomor pos.
+   Peta berukuran sekitar -46 sampai 46. Ubah angka untuk memindahkan pos. */
+const POS = [
+  [-32,9],[-16,9],[0,9],[16,9],[32,9],            // Pos 1–5   (baris tengah, dekat awal)
+  [32,-6],[16,-6],[0,-6],[-16,-6],[-32,-6],       // Pos 6–10  (baris depan gedung)
+  [-32,-26],[-16,-26],[0,-26],[16,-26],[32,-26],  // Pos 11–15 (baris belakang gedung)
+  [32,30],[16,30],[0,30],[-16,30],[-32,30]        // Pos 16–20 (baris dekat kantor kepsek)
+];
+
+const POIN_BENAR = 5;      // poin jika benar di percobaan pertama (20 soal x 5 = 100)
+const PENALTI_SALAH = 1;   // pengurangan poin untuk tiap jawaban salah pada soal itu
+const POIN_MIN = 1;        // poin minimum jika akhirnya benar
+const PALET = [0x4f86f7,0xe8626b,0x3fbf8a,0xffa94d,0x9b6bdc,0x2ec4c4,0xd45fa0,0x8a6a3b]; // warna baju tokoh
+const RAMBUT = [0x23324a,0x3a2a1e,0x777777,0x111111,0x6b4f2a];
+const NPCS = SOAL.map((q,i)=>({
+  id:'pos'+(i+1), nama:'Pos '+(i+1), quiz:i, x:POS[i][0], z:POS[i][1],
+  warna:PALET[i%PALET.length], rambut:RAMBUT[i%RAMBUT.length]
+}));
+/* ===================== AKHIR BAGIAN EDIT ===================== */
+
+// ---------- Dasar scene ----------
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xc9d2ee);
+scene.fog = new THREE.Fog(0xc9d2ee, 80, 300);
+const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 500);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+document.body.prepend(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x88aa77, 0.85));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+sun.position.set(25, 40, 15);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, {left:-60, right:60, top:60, bottom:-60, near:1, far:160});
+scene.add(sun);
+
+function mesh(geo, color, x=0, y=0, z=0, parent=scene){
+  const m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({color}));
+  m.position.set(x,y,z); m.castShadow = true; m.receiveShadow = true;
+  parent.add(m); return m;
+}
+function label(text, bg='#23324a', fg='#fff', w=512){
+  const c = document.createElement('canvas'); c.width = w; c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = bg; g.beginPath(); g.roundRect ? g.roundRect(4,4,w-8,120,28) : g.rect(4,4,w-8,120); g.fill();
+  g.fillStyle = fg; g.font = 'bold 54px "Trebuchet MS",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(text, w/2, 66);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c), transparent:true, depthTest:false}));
+  s.scale.set(w/128*0.9, 0.9, 1); s.renderOrder = 5; return s;
+}
+
+// ---------- Dunia (kota low-poly) ----------
+const ground = mesh(new THREE.BoxGeometry(320,1,320), 0x86b86a, 0,-0.5,0); ground.castShadow = false;
+function pad(x,z,w,d,color,y=0.05,h=0.12){ const p = mesh(new THREE.BoxGeometry(w,h,d), color, x,y,z); p.castShadow=false; return p; }
+function road(x,z,w,d){
+  pad(x,z,w,d,0x3e3a52,0.08,0.16);
+  const horiz = w>d, len = horiz?w:d;
+  for(let i=-len/2+2;i<len/2-1;i+=4) pad(horiz?x+i:x, horiz?z:z+i, horiz?1.6:0.25, horiz?0.25:1.6, 0xf5e6a8, 0.18, 0.04);
+}
+road(0,-20,100,4); road(0,2,100,4); road(0,26,100,4); road(-27,0,4,80); road(27,0,4,80);
+
+function building(x,z,w,d,floors,wall,accent,name){
+  const g = new THREE.Group(); g.position.set(x,0,z); scene.add(g);
+  const h = floors*3;
+  mesh(new THREE.BoxGeometry(w,h,d), wall, 0,h/2,0,g);
+  for(let f=1;f<=floors;f++) mesh(new THREE.BoxGeometry(w+0.4,0.28,d+0.4), accent, 0,f*3-0.14,0,g);
+  mesh(new THREE.BoxGeometry(w+1,0.5,d+1), accent, 0,h+0.25,0,g);
+  mesh(new THREE.BoxGeometry(2.2,1.2,2.2), 0x9aa0ad, w/4,h+1.1,-d/4,g);
+  const n = Math.max(1,Math.floor((w-1.5)/2.6)), step = (w-1.5)/n;
+  for(let f=0;f<floors;f++) for(let i=0;i<n;i++){
+    const wx = -w/2+0.75+step*(i+0.5);
+    if(f===0 && i===(n>>1)){ mesh(new THREE.BoxGeometry(1.8,2.3,0.12), 0x6b4f2a, wx,1.15,d/2+0.05,g); continue; }
+    const wm = mesh(new THREE.BoxGeometry(1.3,1.4,0.12), 0xa8d8ff, wx,f*3+1.8,d/2+0.05,g);
+    wm.material.emissive = new THREE.Color(0x203858); wm.castShadow = false;
+  }
+  if(name){ const t = label(name,'#2b1a52','#fff',512); t.position.set(0,h+3.2,0); g.add(t); }
+  return g;
+}
+building(-18,-14,11,6,3,0xf3e9c6,0x4f86f7,'RUANG KELAS X');
+building(18,-14,9,6,2,0xffe3d9,0xe8626b,'PERPUSTAKAAN');
+building(0,20,14,7,3,0xe8d9b0,0x7c3aed,'KANTOR KEPSEK').rotation.y = Math.PI;
+// bangunan latar di tepi kota
+[[-54,-12,10,8,2,0xdcd3f0],[54,-12,10,8,3,0xf0d9d3],[-54,20,8,8,3,0xd3ead9],[54,20,8,8,2,0xe8e2c8],[-14,-54,12,8,2,0xd3dff0],[16,-54,10,8,3,0xefd3e6]]
+  .forEach(b=>building(b[0],b[1],b[2],b[3],b[4],b[5],0x8b5cf6));
+
+// gerbang sekolah
+(function(){
+  const g = new THREE.Group(); g.position.set(0,0,-1.5); scene.add(g);
+  [-2.6,2.6].forEach(x=>mesh(new THREE.BoxGeometry(0.8,5,0.8), 0xf3e9c6, x,2.5,0,g));
+  mesh(new THREE.BoxGeometry(6.8,0.9,1), 0x7c3aed, 0,5.1,0,g);
+  const t = label('SMA N 2 YOGYAKARTA','#7c3aed','#fff',1024); t.position.set(0,6.6,0); g.add(t);
+})();
+
+// gunung latar
+for(let i=0;i<22;i++){
+  const a = i/22*Math.PI*2 + (i%3)*0.07, r = 105+(i%4)*9, h = 26+((i*37)%24), rad = 22+((i*53)%14), seg = 5+(i%2);
+  const cx = Math.cos(a)*r, cz = Math.sin(a)*r;
+  const m = mesh(new THREE.ConeGeometry(rad,h,seg), [0x7e9b86,0x8aa08f,0x8d98ad,0x75917e][i%4], cx,h/2-1,cz);
+  m.material.flatShading = true; m.castShadow = false;
+  if(h>38){ const c = mesh(new THREE.ConeGeometry(rad*0.28,h*0.28,seg), 0xe9edf5, cx,h-1-0.14*h,cz); c.castShadow = false; }
+}
+
+// pohon & lampu
+let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
+function tree(x,z,s=1){
+  mesh(new THREE.CylinderGeometry(0.25*s,0.35*s,1.6*s,6), 0x7a5230, x,0.8*s,z);
+  mesh(new THREE.ConeGeometry(1.5*s,3.2*s,6), [0x3f8f55,0x4aa35f,0x2f7d4a][(rnd()*3)|0], x,2.9*s,z).material.flatShading = true;
+}
+[[-8,-12],[8,-12],[-8,13],[8,13],[-38,-13],[38,-13],[-38,14],[38,14],[-22,-23],[22,-23],[-22,17],[22,17],[-8,33],[8,33],[-24,33],[24,33],[-40,0],[40,0]].forEach(p=>tree(p[0],p[1]));
+for(let i=0;i<80;i++){
+  const a = rnd()*Math.PI*2, r = 46+rnd()*40, x = Math.cos(a)*r, z = Math.sin(a)*r;
+  if(Math.max(Math.abs(x),Math.abs(z)) < 46) continue;
+  tree(x,z,0.9+rnd()*0.8);
+}
+function lamp(x,z){
+  mesh(new THREE.CylinderGeometry(0.1,0.12,4,6), 0x555566, x,2,z);
+  const b = mesh(new THREE.SphereGeometry(0.3,8,6), 0xffe9a8, x,4.2,z); b.material.emissive = new THREE.Color(0xffd36b); b.castShadow = false;
+}
+[-36,-12,12,36].forEach(x=>{ lamp(x,-0.4); lamp(x,-17.6); lamp(x,28.4); });
+
+// ---------- Karakter ----------
+function makePerson(shirt, opts={}){
+  const g = new THREE.Group();
+  mesh(new THREE.BoxGeometry(0.28,0.8,0.3), opts.pants||0x44526b, -0.2,0.4,0,g);
+  mesh(new THREE.BoxGeometry(0.28,0.8,0.3), opts.pants||0x44526b, 0.2,0.4,0,g);
+  const body = mesh(new THREE.BoxGeometry(0.85,0.95,0.5), shirt, 0,1.25,0,g);
+  mesh(new THREE.BoxGeometry(0.22,0.8,0.25), shirt, -0.55,1.25,0,g);
+  mesh(new THREE.BoxGeometry(0.22,0.8,0.25), shirt, 0.55,1.25,0,g);
+  mesh(new THREE.SphereGeometry(0.4,16,12), 0xf2c9a0, 0,2.05,0,g);
+  mesh(new THREE.SphereGeometry(0.03,6,6), 0x222222, -0.14,2.1,0.37,g);
+  mesh(new THREE.SphereGeometry(0.03,6,6), 0x222222, 0.14,2.1,0.37,g);
+  g.userData.body = body;
+  return g;
+}
+const player = makePerson(0xffffff, {pants:0x8a8f98});          // Siswa: kemeja putih, celana abu-abu
+mesh(new THREE.BoxGeometry(0.7,0.8,0.25), 0x3b6fd8, 0,1.3,-0.38,player);  // tas
+mesh(new THREE.SphereGeometry(0.42,16,8,0,Math.PI*2,0,Math.PI/2), 0x23324a, 0,2.1,0,player); // rambut
+const pTag = label('Siswa','#3fbf8a'); pTag.position.set(0,3.2,0); pTag.scale.multiplyScalar(0.6); player.add(pTag);
+player.position.set(0,0,2); scene.add(player);
+
+const npcObjs = NPCS.map(d=>{
+  const g = makePerson(d.warna);
+  mesh(new THREE.SphereGeometry(0.42,16,8,0,Math.PI*2,0,Math.PI/2), d.rambut, 0,2.1,0,g);
+  g.position.set(d.x,0,d.z);
+  const tag = label('POS '+(d.quiz+1), '#23324a', '#fff', 256); tag.position.set(0,3.3,0); tag.scale.multiplyScalar(1.2); g.add(tag);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(2.6,3,40), new THREE.MeshBasicMaterial({color:0xffc94a, transparent:true, opacity:.65, side:THREE.DoubleSide}));
+  ring.rotation.x = -Math.PI/2; ring.position.y = 0.15; g.add(ring);
+  const mark = label('?','#ffc94a','#23324a',128); mark.scale.set(0.9,0.9,1); mark.position.set(0,4.2,0); g.add(mark);
+  scene.add(g);
+  return {d, g, ring, mark, done:false, base:0, lock:false};
+});
+
+// ---------- Efek lencana & konfeti ----------
+const confetti = [];
+function burst(pos){
+  for(let i=0;i<36;i++){
+    const m = new THREE.Mesh(new THREE.BoxGeometry(.15,.15,.15), new THREE.MeshBasicMaterial({color:[0xffc94a,0x3fbf8a,0xe8626b,0x4f86f7][i%4]}));
+    m.position.copy(pos).add(new THREE.Vector3(0,3,0)); scene.add(m);
+    confetti.push({m, v:new THREE.Vector3((Math.random()-.5)*6, 4+Math.random()*5, (Math.random()-.5)*6), life:1.6});
+  }
+}
+function giveBadge(n){
+  n.done = true;
+  n.g.userData.body.material.emissive = new THREE.Color(0x2a9a6c);
+  n.ring.material.color.set(0x3fbf8a);
+  n.g.remove(n.mark);
+  const star = mesh(new THREE.OctahedronGeometry(0.45), 0xffc94a, 0,3.9,0,n.g);
+  star.material.emissive = new THREE.Color(0x9a7000); n.star = star;
+  burst(n.g.position);
+}
+
+// ---------- Input ----------
+const keys = {};
+addEventListener('keydown', e=>{ if(e.target.tagName==='INPUT') return; keys[e.code]=true; if(e.code.startsWith('Arrow')) e.preventDefault(); });
+addEventListener('keyup', e=>{ keys[e.code]=false; });
+
+// ---------- UI & Kuis ----------
+const $ = id => document.getElementById(id);
+let score = 0, doneCount = 0, active = null;
+let started = false, tStart = 0, tEnd = 0, salahTotal = 0, benarLangsung = 0, namaSiswa = '', kelasSiswa = '';
+const frozen = () => !started || active || !$('end').classList.contains('hidden');
+
+function openDialog(n){
+  const d = n.d, q = SOAL[d.quiz];
+  active = n;
+  $('dIcon').textContent = d.quiz+1; $('dIcon').style.background = '#'+d.warna.toString(16).padStart(6,'0')+'44';
+  $('dName').textContent = d.nama;
+  $('dStatus').textContent = 'Soal nomor '+(d.quiz+1)+' dari '+SOAL.length;
+  $('dNarasi').textContent = q.narasi || ''; $('dNarasi').classList.toggle('hidden', !q.narasi);
+  $('dQ').textContent = q.pertanyaan;
+  $('dFb').textContent = ''; $('dFb').className = '';
+  $('dNext').classList.add('hidden'); $('dClose').classList.remove('hidden');
+  const box = $('dOpts'); box.innerHTML = '';
+  q.pilihan.forEach((t,i)=>{
+    const b = document.createElement('button');
+    b.className = 'opt'; b.textContent = String.fromCharCode(65+i)+'. '+t;
+    b.onclick = ()=>answer(b,i);
+    box.appendChild(b);
+  });
+  $('dlg').querySelector('.card').scrollTop = 0;
+  $('dlg').classList.remove('hidden');
+}
+function closeDialog(){
+  if(active) active.lock = true;       // tidak muncul lagi sampai pemain menjauh
+  active = null; $('dlg').classList.add('hidden');
+}
+function answer(btn, i){
+  const n = active, q = SOAL[n.d.quiz];
+  if(i === q.benar){
+    btn.classList.add('right');
+    [...$('dOpts').children].forEach(b=>b.disabled = true);
+    $('dFb').className = 'ok';
+    const gain = Math.max(POIN_MIN, POIN_BENAR - (n.salah||0)*PENALTI_SALAH);
+    if(!n.salah) benarLangsung++;
+    $('dFb').textContent = '✅ Benar! +'+gain+' poin. '+(q.penjelasan||'');
+    score += gain; doneCount++;
+    $('score').textContent = score; $('badges').textContent = doneCount+'/'+NPCS.length;
+    $('flash').classList.remove('on'); void $('flash').offsetWidth; $('flash').classList.add('on');
+    giveBadge(n);
+    $('dNext').textContent = doneCount === NPCS.length ? 'Selesai 🎉' : 'Lanjut jalan-jalan';
+    $('dNext').classList.remove('hidden'); $('dNext').focus();
+    $('dClose').classList.add('hidden');
+  } else {
+    btn.classList.add('wrong'); btn.disabled = true; n.salah = (n.salah||0)+1; salahTotal++;
+    $('dFb').className = 'no';
+    $('dFb').textContent = '❌ Belum tepat, coba pilihan lain ya!';
+  }
+}
+$('dNext').onclick = ()=>{
+  closeDialog();
+  if(doneCount === NPCS.length){ tEnd = Date.now(); showResult(); }
+};
+$('dClose').onclick = closeDialog;
+
+// ---------- Data siswa & kartu hasil ----------
+function mulai(){
+  const nama = $('inNama').value.trim(), kelas = $('inKelas').value.trim();
+  if(!nama || !kelas){ $('startErr').textContent = 'Isi nama dan kelas dulu ya.'; return; }
+  namaSiswa = nama; kelasSiswa = kelas; started = true; tStart = Date.now();
+  const t = label(nama.slice(0,16), '#3fbf8a'); t.position.copy(pTag.position); t.scale.copy(pTag.scale);
+  player.remove(pTag); player.add(t);
+  $('start').classList.add('hidden'); document.body.classList.add('playing');
+}
+$('btnMulai').onclick = mulai;
+[$('inNama'), $('inKelas')].forEach(el => el.addEventListener('keydown', e => { if(e.key==='Enter') mulai(); }));
+$('inNama').focus();
+
+function ringkasan(){
+  const t = (tEnd || Date.now()) - tStart, m = Math.floor(t/60000), d = Math.floor(t/1000)%60;
+  return {
+    Nama: namaSiswa, Kelas: kelasSiswa,
+    Skor: score+' / '+(SOAL.length*POIN_BENAR),
+    'Pos selesai': doneCount+' dari '+NPCS.length,
+    'Benar di percobaan pertama': benarLangsung+' dari '+NPCS.length,
+    'Jawaban salah': salahTotal+' kali',
+    'Waktu bermain': m+' menit '+d+' detik',
+    Tanggal: new Date().toLocaleString('id-ID', {dateStyle:'long', timeStyle:'short'})
+  };
+}
+function showResult(){
+  const r = ringkasan();
+  $('rTitle').textContent = doneCount === NPCS.length ? 'Selamat, semua pos sudah diselesaikan!' : 'Hasil sementara';
+  $('rNama').textContent = r.Nama; $('rKelas').textContent = r.Kelas; $('rSkor').textContent = r.Skor;
+  $('rPos').textContent = r['Pos selesai']; $('rLangsung').textContent = r['Benar di percobaan pertama'];
+  $('rSalah').textContent = r['Jawaban salah']; $('rWaktu').textContent = r['Waktu bermain']; $('rTanggal').textContent = r.Tanggal;
+  $('rMsg').textContent = 'Foto atau tangkapan layar kartu ini, lalu kirim ke guru.';
+  $('end').classList.remove('hidden');
+}
+$('btnHasil').onclick = () => { if(started) showResult(); };
+$('btnTutup').onclick = () => $('end').classList.add('hidden');
+$('btnSalin').onclick = async () => {
+  const txt = 'Hasil Socio Verse – Sosiologi X (SMA N 2 Yogyakarta)\n' + Object.entries(ringkasan()).map(([k,v]) => k+': '+v).join('\n');
+  let ok = false;
+  try { await navigator.clipboard.writeText(txt); ok = true; }
+  catch(e){
+    const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { ok = document.execCommand('copy'); } catch(_){} ta.remove();
+  }
+  $('rMsg').textContent = ok ? 'Hasil disalin. Tempel ke chat guru.' : 'Tidak bisa menyalin. Silakan foto atau tangkapan layar kartu ini.';
+};
+
+// ---------- Loop utama ----------
+const clock = new THREE.Clock();
+const camOff = new THREE.Vector3(0,10,13);
+const areaName = (x,z)=> z>10 ? 'Kantor Kepala Sekolah' : (z<-2 && x<-8) ? 'Ruang Kelas X' : (z<-2 && x>8) ? 'Perpustakaan' : 'Halaman sekolah';
+
+const mg = $('mini').getContext('2d');
+function drawMini(){
+  const f = v => (v+44)/88*140;
+  mg.clearRect(0,0,140,140); mg.textAlign = 'center'; mg.font = 'bold 9px sans-serif'; mg.lineWidth = 1.5; mg.strokeStyle = '#23324a';
+  npcObjs.forEach(n=>{
+    const x = f(n.d.x), y = f(n.d.z);
+    mg.fillStyle = n.done ? '#3fbf8a' : '#ffc94a';
+    mg.beginPath(); mg.arc(x,y,n.done?4:5,0,7); mg.fill(); mg.stroke();
+    if(!n.done){ mg.fillStyle = '#fff'; mg.fillText(n.d.quiz+1, x, y-7); }
+  });
+  mg.fillStyle = '#e8626b'; mg.strokeStyle = '#fff'; mg.lineWidth = 2;
+  mg.beginPath(); mg.arc(f(player.position.x), f(player.position.z), 5, 0, 7); mg.fill(); mg.stroke();
+}
+function tick(){
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+
+  // gerak pemain (dibekukan saat dialog terbuka)
+  if(!frozen()){
+    let dx = (keys.KeyD||keys.ArrowRight?1:0) - (keys.KeyA||keys.ArrowLeft?1:0);
+    let dz = (keys.KeyS||keys.ArrowDown?1:0) - (keys.KeyW||keys.ArrowUp?1:0);
+    if(dx||dz){
+      const l = Math.hypot(dx,dz); dx/=l; dz/=l;
+      player.position.x = THREE.MathUtils.clamp(player.position.x + dx*7*dt, -40, 40);
+      player.position.z = THREE.MathUtils.clamp(player.position.z + dz*7*dt, -40, 40);
+      const target = Math.atan2(dx,dz);
+      let diff = ((target - player.rotation.y + Math.PI*3) % (Math.PI*2)) - Math.PI;
+      player.rotation.y += diff * Math.min(1, dt*12);
+      player.userData.body.position.y = 1.25 + Math.abs(Math.sin(t*12))*0.08;
+    } else player.userData.body.position.y = 1.25;
+  }
+
+  // NPC: animasi + deteksi jarak
+  npcObjs.forEach(n=>{
+    const dist = Math.hypot(player.position.x-n.g.position.x, player.position.z-n.g.position.z);
+    n.g.position.y = Math.sin(t*2 + n.d.x)*0.05;
+    n.ring.rotation.z = t;
+    if(n.mark.parent) n.mark.position.y = 4.1 + Math.sin(t*3)*0.15;
+    if(n.star){ n.star.rotation.y = t*2; n.star.position.y = 3.9 + Math.sin(t*3)*0.1; }
+    const near = dist < 4;
+    const want = near ? Math.atan2(player.position.x-n.g.position.x, player.position.z-n.g.position.z) : n.base;
+    n.g.rotation.y += (((want - n.g.rotation.y + Math.PI*3) % (Math.PI*2)) - Math.PI) * Math.min(1, dt*6);
+    if(dist > 6) n.lock = false;
+    if(near && !n.done && !n.lock && !frozen()) openDialog(n);
+  });
+
+  // konfeti
+  for(let i=confetti.length-1;i>=0;i--){
+    const c = confetti[i]; c.life -= dt; c.v.y -= 12*dt;
+    c.m.position.addScaledVector(c.v, dt); c.m.rotation.x += dt*6;
+    if(c.life<=0){ scene.remove(c.m); confetti.splice(i,1); }
+  }
+
+  // kamera mengikuti
+  if(!started){ const ang = t*0.07; camera.position.set(Math.cos(ang)*58, 34, Math.sin(ang)*58); camera.lookAt(0,2,0); }
+  else {
+    const goal = player.position.clone().add(camOff);
+    camera.position.lerp(goal, Math.min(1, dt*4));
+    camera.lookAt(player.position.x, 1.2, player.position.z);
+  }
+
+  drawMini();
+  $('area').textContent = areaName(player.position.x, player.position.z);
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+camera.position.copy(player.position).add(camOff);
+tick();
+</script>
+</body>
+</html>

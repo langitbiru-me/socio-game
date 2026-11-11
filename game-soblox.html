@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Soblox Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#bfe6ff;font-family:'Baloo 2','Trebuchet MS',system-ui,sans-serif;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+canvas{display:block;width:100%;height:100%}
+.logo{font-weight:800;-webkit-text-stroke:7px #fff;paint-order:stroke fill;text-shadow:0 5px 0 #7a2bd6}#joy{touch-action:none}
+:root{color-scheme:light}
+html,body{color:#334155!important}
+textarea{user-select:text;-webkit-user-select:text;touch-action:auto;background:#fff;color:#1e293b}
+.bx{margin:0;font-family:'Montserrat','Arial Black',Impact,sans-serif;font-weight:900;line-height:1;color:#fff;filter:drop-shadow(3px 0 0 #1b2559) drop-shadow(-3px 0 0 #1b2559) drop-shadow(0 3px 0 #1b2559) drop-shadow(0 -3px 0 #1b2559) drop-shadow(0 8px 0 #1b2559)}
+.bxw{display:block;font-size:clamp(3rem,14vw,6.5rem);letter-spacing:-.02em;white-space:nowrap}
+.sq{display:inline-block;box-sizing:border-box;width:.7em;height:.7em;border:.19em solid #fff;margin:0 .05em}
+.sq.r{transform:rotate(-12deg)}
+body.m .bg-pink-500{background-color:#3b82f6}
+body.m .hover\:bg-pink-600:hover{background-color:#2563eb}
+body.m .text-pink-500{color:#3b82f6}
+body.m .text-pink-600{color:#2563eb}
+body.m .border-pink-200{border-color:#bfdbfe}
+body.m .border-pink-300{border-color:#93c5fd}
+body.m .border-pink-400{border-color:#60a5fa}
+body.m .accent-pink-500{accent-color:#3b82f6}
+.bxj{display:block;margin-top:.9rem;padding-left:.2em;font-size:clamp(1.5rem,6vw,2.8rem);letter-spacing:.2em;color:#ffd23f}
+</style></head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hu" class="fixed top-2 left-2 z-10 flex items-center gap-2 bg-white/90 rounded-2xl shadow-lg p-2 pr-4 font-bold text-slate-700 text-xs sm:text-base leading-tight border-2 border-pink-200"></div>
+<div id="tm" class="fixed top-2 right-16 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 z-10 flex items-center gap-2 bg-slate-700/90 text-white rounded-full pl-1 pr-1.5 py-1 shadow-lg font-extrabold text-lg"><span class="w-8 h-8 rounded-full bg-sky-300 border-4 border-white inline-block"></span><span id="tmr">03:00</span><button id="mu" onclick="openA()" class="w-8 h-8 rounded-full bg-white/90 text-pink-500 font-extrabold text-lg leading-none">♪</button></div>
+<button id="pz" onclick="pause()" class="fixed top-2 right-2 z-10 w-11 h-11 rounded-xl bg-violet-500 shadow-lg flex gap-1.5 items-center justify-center"><i class="w-1.5 h-5 bg-white rounded"></i><i class="w-1.5 h-5 bg-white rounded"></i></button>
+<div id="nb" class="fixed z-10 top-20 left-2 sm:top-4 sm:left-auto sm:right-20 max-w-[50%] sm:max-w-xs bg-white/95 rounded-3xl shadow-lg px-4 py-2 text-xs sm:text-sm font-bold text-slate-700 border-2 border-pink-200"></div>
+<div id="ms" class="fixed top-16 sm:top-28 right-2 z-10 bg-white/90 rounded-2xl shadow p-2 text-xs sm:text-sm max-w-[40%]"></div>
+<div id="pr" class="hidden fixed bottom-56 sm:bottom-20 left-1/2 -translate-x-1/2 z-10 bg-yellow-300 text-slate-800 font-bold rounded-full px-4 py-2 shadow-lg text-sm"></div>
+
+<div id="dlg" class="hidden fixed z-20 w-[17rem] sm:w-[22rem] bg-white rounded-3xl shadow-2xl px-4 py-3 border-4 border-pink-300">
+  <div id="dn" class="font-extrabold text-pink-600 mb-1"></div>
+  <div id="dt" class="text-slate-700 text-sm sm:text-base min-h-[2.2rem]"></div>
+  <button onclick="act()" class="mt-2 float-right bg-pink-500 text-white font-bold rounded-full px-5 py-1.5">Lanjut (Spasi)</button><div class="clear-both"></div><i id="dtl" class="absolute -bottom-[11px] -ml-2 w-4 h-4 bg-white border-r-4 border-b-4 border-pink-300 rotate-45"></i>
+</div>
+
+<div id="joy" class="hidden fixed bottom-6 left-6 z-10 w-28 h-28 rounded-full bg-white/40 border-2 border-white/80">
+  <div id="jk" class="absolute left-1/2 top-1/2 -ml-6 -mt-6 w-12 h-12 rounded-full bg-white/90 shadow"></div></div>
+<button id="bj" class="hidden fixed bottom-6 right-6 z-10 w-16 h-16 rounded-full bg-sky-500/90 text-white font-bold shadow">Lompat</button>
+<button id="be" class="hidden fixed bottom-28 right-8 z-10 w-16 h-16 rounded-full bg-yellow-400 text-slate-800 font-extrabold shadow">E</button>
+
+<div id="tk" class="fixed z-10 bottom-2 max-sm:bottom-40 left-1/2 -translate-x-1/2 w-[min(94vw,27rem)] bg-white/90 rounded-2xl shadow-lg px-3 py-2 border-2 border-pink-200 pointer-events-none"></div>
+
+<div id="sb" class="hidden fixed z-[31] pointer-events-none w-max max-w-[15rem] bg-white border-4 border-pink-300 rounded-3xl shadow-xl px-4 py-2 text-center font-extrabold text-slate-700 text-sm sm:text-base leading-snug"><span id="sbt">Hi. Aku Sesilia. Ayo Ikuti Perjalanan Hidupku.</span><i class="absolute -bottom-[11px] -ml-2 w-4 h-4 bg-white border-r-4 border-b-4 border-pink-300 rotate-45"></i></div>
+<div id="rot" class="hidden fixed inset-x-3 top-1/3 z-50 bg-white rounded-3xl shadow-2xl border-4 border-sky-300 p-4 text-center font-bold text-slate-700"><div class="text-4xl text-sky-500">↻</div><p class="mt-1">Putar HP ke mode <b>landscape</b> (miring) agar lebih nyaman bermain.</p><button class="mt-3 w-full bg-sky-500 text-white font-extrabold rounded-full py-2" onclick="rotX=1;chkRot()">Lanjut main</button></div>
+<div id="ov" class="hidden fixed inset-0 z-30 flex items-center justify-center p-3 bg-black/40 overflow-y-auto"></div>
+<div id="load" class="fixed inset-0 z-40 flex flex-col items-center justify-center bg-sky-200 text-sky-900 font-extrabold text-xl">
+  <div class="w-12 h-12 border-8 border-sky-500 border-t-transparent rounded-full animate-spin mb-4"></div>Menyiapkan dunia 3D…</div>
+
+<script>
+const TOUCH='ontouchstart'in window||navigator.maxTouchPoints>0,LOW=TOUCH&&Math.max(screen.width,screen.height)<1000;
+const $=i=>document.getElementById(i),T=THREE;
+const MC={},mat=c=>MC[c]||(MC[c]=new T.MeshLambertMaterial({color:c}));
+const R=new T.WebGLRenderer({canvas:$('c'),antialias:true});R.shadowMap.enabled=true;
+const S=new T.Scene(),CAM=new T.PerspectiveCamera(60,1,.1,200);
+const sun=new T.DirectionalLight(0xffffff,.75);sun.castShadow=true;sun.shadow.mapSize.set(LOW?512:1024,LOW?512:1024);
+const sh=sun.shadow.camera;sh.left=sh.bottom=-25;sh.right=sh.top=25;sh.far=90;
+S.add(new T.HemisphereLight(0xffffff,0x88aa77,.95),sun,sun.target);
+function resize(){R.setPixelRatio(Math.min(devicePixelRatio,LOW?1.5:2));R.setSize(innerWidth,innerHeight,false);CAM.aspect=innerWidth/innerHeight;CAM.updateProjectionMatrix()}
+addEventListener('resize',resize);resize();
+
+let G='f',NM='Sesilia',NK='Nadia',stars=[],cloud=[],PT=[],bonus=0,mgs=null,pk=0,lt=0,world,cols,npcs,pl,lv=0,st='load',run=false,score=0,tm=0,jump=false,yaw=0,pit=.4,cur=null,cq=[],qi=0,dl=[],di=0,near=null;
+const P={x:0,y:0,z:0,vy:0,s:1},keys={},res={};
+
+/* ---------- helpers ---------- */
+function B(x,y,z,w,h,d,c,solid){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat(c));m.position.set(x,y+h/2,z);m.castShadow=m.receiveShadow=true;world.add(m);if(solid)cols.push({a:x-w/2,b:x+w/2,c:z-d/2,d:z+d/2,h:y+h});return m}
+const wall=(x1,z1,x2,z2,h,c)=>z1==z2?B((x1+x2)/2,0,z1,Math.abs(x2-x1),h,.4,c,1):B(x1,0,(z1+z2)/2,.4,h,Math.abs(z2-z1),c,1);
+const tree=(x,z)=>{B(x,0,z,.6,1.8,.6,0x8a5a34,1);[[0,3,0,1.6],[.8,2.5,.2,1.1],[-.7,2.6,-.3,1.2]].forEach(a=>{const m=new T.Mesh(new T.SphereGeometry(a[3],14,10),mat(0x4cc05a));m.position.set(x+a[0],a[1],z+a[2]);m.castShadow=true;world.add(m)})};
+const roof=(x,y,z,w,d,h,c)=>{const m=new T.Mesh(new T.ConeGeometry(.7071,h,4),mat(c));m.rotation.y=Math.PI/4;m.scale.set(w,1,d);m.position.set(x,y+h/2,z);m.castShadow=true;world.add(m)};
+const sign=(t,x,y,z,w,h,bg)=>{const c=document.createElement('canvas');c.width=256;c.height=96;const g=c.getContext('2d');g.fillStyle=bg;g.fillRect(0,0,256,96);g.fillStyle='#fff';g.font='800 62px Baloo 2,Arial';g.textAlign='center';g.textBaseline='middle';g.fillText(t,128,50);const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:new T.CanvasTexture(c)}));m.position.set(x,y,z);world.add(m)};
+const gr=c=>B(0,-.2,0,140,.2,140,c);
+function chr(o){const g=new T.Group(),M=(geo,c,x,y,z,p)=>{const m=new T.Mesh(geo,mat(c));m.position.set(x,y,z);m.castShadow=true;(p||g).add(m);return m},
+cy=(a,b,h,c,x,y,z,p)=>M(new T.CylinderGeometry(a,b,h,12),c,x,y,z,p),
+sp=(r,c,x,y,z,sx,sy,sz,p)=>{const m=M(new T.SphereGeometry(r,16,12),c,x,y,z,p);m.scale.set(sx,sy,sz);return m},
+pv=(x,y)=>{const q=new T.Group();q.position.set(x,y,0);g.add(q);return q},
+k=o.k||0xf1c27d,l1=pv(-.17,.62),l2=pv(.17,.62),a1=pv(-.42,1.2),a2=pv(.42,1.2),hg=pv(0,1.3);
+[l1,l2].forEach(l=>{cy(.12,.11,.62,o.pa,0,-.31,0,l);sp(.14,0x3a2f3f,0,-.6,.05,1,.6,1.5,l)});
+[a1,a2].forEach(a=>{cy(.11,.1,.28,o.sh,0,-.14,0,a);cy(.085,.08,.36,k,0,-.4,0,a);sp(.1,k,0,-.6,0,1,1,1,a)});
+const t=cy(.3,.33,.62,o.sh,0,.92,0);t.scale.z=.75;
+if(o.sk)cy(.3,.5,.4,o.sk,0,.72,0);
+if(o.tie)M(new T.BoxGeometry(.1,.34,.04),0x2e4a8a,0,1,.25);
+if(o.bag)M(new T.BoxGeometry(.5,.6,.22),0x8b3a3a,0,1,-.3);
+sp(.5,k,0,.45,0,1,1,1,hg);sp(.54,o.h,0,.52,-.08,1,.95,1,hg);
+if(o.long){const b=cy(.46,.4,.75,o.h,0,-.12,-.2,hg);b.scale.z=.5}
+sp(.3,o.h,0,.83,.3,1.4,.5,.5,hg);
+[-1,1].forEach(i=>{sp(.075,0x1b1b1b,i*.17,.42,.46,1,1.3,.5,hg);sp(.025,0xffffff,i*.17+.02,.46,.5,1,1,1,hg);sp(.07,0xff8aa5,i*.28,.3,.4,1,.7,.5,hg);if(o.bow)sp(.12,0xff5fa2,i*.46,.82,0,1,1,1,hg)});
+sp(.05,0xc2415a,0,.27,.46,1.6,.6,.5,hg);
+g.userData={l1,l2,a1,a2};hg.scale.setScalar(o.hs||1);g.scale.setScalar(o.s||1);return g}
+
+/* ---------- materi kuis ---------- */
+const Q={
+agen1:{q:'Sesilia (1 tahun) meniru kata “mamam” dari ibunya. Mengapa keluarga disebut agen sosialisasi utama pada tahap ini?',o:['Karena keluarga adalah lingkungan pertama yang paling dekat dan intens, tempat dasar bahasa dan perilaku dibentuk','Karena keluarga memiliki aturan tertulis dan kurikulum untuk menilai perkembangan anak','Karena keluarga menyebarkan nilai dan tren kepada banyak orang sekaligus lewat berbagai media'],e:'Keluarga adalah agen sosialisasi pertama dan utama. Bayi belajar bahasa dan perilaku dasar dari orang terdekat. Aturan tertulis ciri agen formal (sekolah), sedangkan penyebaran tren luas ciri media massa.'},
+bentuk1:{q:'Ibu mengajarkan “mamam” lewat obrolan dan kasih sayang sehari-hari, tanpa jadwal atau kurikulum. Apa bentuk sosialisasinya?',o:['Sosialisasi informal (primer): berlangsung alami di dalam keluarga tanpa aturan resmi','Sosialisasi formal (primer): berlangsung di dalam keluarga dengan aturan tertulis','Sosialisasi informal (sekunder): berlangsung alami di luar keluarga setelah anak dewasa'],e:'Di keluarga, belajar terjadi alami tanpa aturan resmi, itulah sosialisasi informal atau primer. Sosialisasi sekunder terjadi setelah primer dan berlangsung di luar keluarga.'},
+agen2:{q:'Sesilia (7 tahun) bermain masak-masakan dan bergantian mainan dengan anak tetangga di teras. Agen sosialisasi mana yang dominan?',o:['Teman sebaya: hubungan setara yang membuat anak belajar berbagi dan bekerja sama','Keluarga: orang tua tetap menentukan seluruh aturan permainan di teras rumah','Lingkungan masyarakat: norma warga sekitar yang mengatur cara anak bermain'],e:'Anak-anak sepermainan adalah teman sebaya. Mereka berinteraksi secara setara, tidak diatur langsung oleh orang tua, sehingga belajar berbagi dan bekerja sama.'},
+fungsi2:{q:'Saat bermain, Sesilia berpura-pura menjadi ibu dan temannya menjadi pembeli. Apa fungsi teman sebaya bagi Sesilia, dan ciri tahap apa yang tampak?',o:['Belajar solidaritas dan berinteraksi tanpa otoritas orang tua, sambil mengambil peran orang lain (Play Stage)','Belajar menaati aturan resmi dan sanksi, sambil memahami harapan seluruh masyarakat (Generalized Other)','Meniru ucapan orang dewasa tanpa memahami maknanya (Preparatory Stage)'],e:'Teman sebaya melatih solidaritas dan interaksi tanpa otoritas orang tua. Bermain peran menandai Play Stage, saat anak mulai memahami peran orang lain. Meniru tanpa paham makna ciri Preparatory Stage.'},
+sekolah3:{q:'Bu Guru melarang mencontek dan memberi sanksi bagi pelanggar. Mengapa sekolah disebut agen sosialisasi formal, dan nilai apa yang ditanamkan?',o:['Karena memiliki aturan resmi, kurikulum, dan sanksi yang terstruktur; menanamkan kejujuran dan disiplin','Karena guru lebih dekat secara emosional daripada orang tua; menanamkan kasih sayang','Karena siswa menyusun aturan sendiri secara bebas; menanamkan solidaritas tanpa otoritas'],e:'Sekolah bersifat formal karena punya tata aturan, kurikulum, dan sanksi resmi. Larangan mencontek menanamkan kejujuran dan disiplin. Aturan yang dibuat bebas oleh sesama anak ciri teman sebaya.'},
+media3:{q:'Sesilia meniru gaya berpakaian selebgram di media sosial. Pernyataan mana yang paling tepat tentang media massa sebagai agen sosialisasi?',o:['Media massa menyebarkan tren dan nilai secara luas sehingga memengaruhi gaya hidup; dampaknya bisa positif atau negatif, jadi perlu selektif','Media massa tergolong agen formal karena isinya diatur kurikulum, sehingga pengaruhnya selalu positif','Media massa hanya memengaruhi hiburan dan tidak memengaruhi perilaku karena interaksinya tidak langsung'],e:'Media massa adalah agen sosialisasi modern. Ia menyebarkan tren dan nilai kepada banyak orang sehingga membentuk gaya hidup. Dampaknya bisa positif maupun negatif, jadi pengguna perlu selektif.'},
+lingk4:{q:'Sesilia ikut kerja bakti dan menyesuaikan diri dengan kebiasaan warga di tempat tinggalnya. Agen apa yang berperan, dan apa yang ditanamkannya?',o:['Lingkungan masyarakat: menanamkan norma dan kebiasaan sekitar tempat tinggal, seperti gotong royong','Teman sebaya: menanamkan solidaritas lewat hubungan setara dalam kelompok seumuran','Tempat kerja: menanamkan aturan resmi perusahaan lewat jabatan dan kontrak'],e:'Lingkungan masyarakat menanamkan norma sekitar tempat tinggal, misalnya gotong royong dan kebersamaan, lewat kebiasaan warga. Ini berbeda dari teman sebaya (kelompok seumuran) dan tempat kerja (aturan organisasi).'},
+sek4:{q:'Setelah bekerja dan ikut arisan, Sesilia belajar peran baru di luar keluarga. Mengapa ini sosialisasi sekunder, dan tahap Mead apa yang tercapai?',o:['Terjadi setelah sosialisasi primer, saat orang dewasa belajar peran dan norma baru; mencerminkan Generalized Other','Terjadi sebelum sosialisasi primer di keluarga; mencerminkan Preparatory Stage','Terjadi hanya di lembaga formal seperti sekolah; mencerminkan Game Stage'],e:'Sosialisasi sekunder berlangsung setelah primer, saat dewasa belajar peran baru di kerja dan masyarakat. Memahami norma dan harapan masyarakat luas adalah ciri Generalized Other.'}};
+
+/* ---------- level ---------- */
+const LV=[
+{t:'Level 1: Preparatory Stage',st:'Preparatory Stage',a:'1 tahun',nb:'Sesilia mulai belajar meniru kata “mamam” dari ibunya.',s:.55,sky:0xbfe6ff,g:0x9bd68a,sx:0,sz:3,ok:0,
+story:'Sesilia masih balita. Di rumah, ia belajar meniru kata “mamam” dari ibunya. Jelajahi rumah, lalu temui Ibu (tekan Spasi di dekatnya).',
+ins:'Preparatory Stage: anak meniru orang terdekat tanpa benar-benar memahami maknanya.',
+pc:{sh:0xffd54a,pa:0xffd54a,hs:1.3},
+b(){gr(0x9bd68a);B(0,0,0,16,.05,12,0xd9b383);
+wall(-8,-6,8,-6,3.5,0xfff1d6);wall(-8,-6,-8,6,3.5,0xfff1d6);wall(8,-6,8,6,3.5,0xfff1d6);wall(-8,6,-1.6,6,3.5,0xfff1d6);wall(1.6,6,8,6,3.5,0xfff1d6);
+B(0,.05,0,5,.04,4,0x6ec1e4);B(-5,0,-4.8,4,.9,1.4,0xe56b8a,1);B(3,0,-2,2.4,.8,1.4,0x8b5a2b,1);B(-6,0,1.5,2.4,.9,1.8,0xffffff,1);B(0,0,-5.7,3,1.6,.3,0x222222,1);
+B(0,0,10,3,.03,8,0xe8d9b5);B(0,0,16,34,.8,.2,0xffffff,1);B(5.5,0,-5.4,3,2.2,.6,0xb5733a,1);[0,1,2,3].forEach(i=>B(4.4+i*.6,1.2,-5.1,.4,.6,.3,[0xe63946,0x4cc9f0,0xf9c74f,0x80ed99][i]));{const m=new T.Mesh(new T.SphereGeometry(.4,10,8),mat(0xb5733a));m.position.set(-3,.4,3);world.add(m)}
+[[-9,12],[10,11],[-15,2],[15,-3],[15,7],[-15,-9],[12,-12],[0,-13]].forEach(p=>tree(...p))},
+n:[{x:1,z:-3.5,r:0,o:{sh:0xe76f51,pa:0x264653,h:0x2b1a10,sk:0xe76f51},n:'Ibu',m:'Bicara dengan Ibu',
+l:['Ibu: Sesilia sayang, sini, Nak! Ibu siapkan makanan.','Ibu: “Ma-mam… ayo bilang mamam, Nak!”','Sesilia menirukan: “Ma… mam!” Ibu bertepuk tangan bangga.'],q:['agen1','bentuk1']},
+{x:6,z:2,r:-1.5,o:{sh:0x457b9d,pa:0x333333,h:0x222222},n:'Ayah',l:['Ayah: Wah, Sesilia sudah pintar! Bermainlah di rumah, ya.']}]},
+
+{t:'Level 2: Play Stage',st:'Play Stage',a:'7 tahun',nb:'Sesilia bermain masak-masakan bersama teman-teman di teras rumah.',s:.75,sky:0xc9ecff,g:0xa5dd8d,sx:0,sz:0,ok:0,
+story:'Sesilia kini anak-anak. Di teras rumah, ia bermain masak-masakan dan berbagi mainan dengan anak-anak tetangga. Temui Dina.',
+ins:'Play Stage: anak mulai mengambil peran orang lain lewat permainan, misalnya berpura-pura jadi koki.',
+pc:{sh:0xff8fb8,pa:0xf1c27d,sk:0xff8fb8,hs:1.15},
+b(){gr(0xa5dd8d);B(0,0,12,80,.03,6,0x6b7077);
+B(0,0,-12,14,5,6,0xf5c26b,1);roof(0,5,-12,15,7,2.8,0xd64550);B(0,0,-8.95,1.6,2.8,.1,0x6b3f1d);B(0,0,-5.5,10,.15,4,0xe0c9a6);
+B(-4.5,0,-4,.4,3,.4,0xffffff,1);B(4.5,0,-4,.4,3,.4,0xffffff,1);B(3,.15,-6,2,1,1,0xff9ec2,1);B(0,.15,-5,3,.04,3,0xffe08a);
+B(-18,0,-8,8,4.5,6,0x8ecae6,1);B(18,0,-8,8,4.5,6,0xb5e48c,1);roof(-18,4.5,-8,8.6,6.6,2.4,0x5e60ce);roof(18,4.5,-8,8.6,6.6,2.4,0xf7918a);
+B(-9.5,0,3,.3,3,.3,0xe63946,1);B(-6.5,0,3,.3,3,.3,0xe63946,1);B(-8,3,3,3.3,.3,.3,0xe63946);B(-8,.9,3,.6,.1,.4,0x333333);
+B(8,0,3,4,.4,4,0xf2d58a,1);
+[[-12,0],[13,-1],[-22,6],[22,5],[-14,-16],[14,-16]].forEach(p=>tree(...p))},
+n:[{x:2,z:-3,r:3.3,o:{sh:0x2a9d8f,pa:0x264653,h:0x5a3a22,s:.8},n:'Dina',m:'Bermain dengan Dina',
+l:['Dina: Sesilia, ayo main masak-masakan di teras!','Sesilia berbagi mainan panci dengan Dina dan teman-teman lain.','Dina: Kamu baik sekali. Kita main bareng terus, ya!'],q:['agen2','fungsi2']},
+{x:-2,z:-4,r:2.8,o:{sh:0xf4a261,pa:0x335c67,h:0x222222,s:.8},n:'Budi',l:['Budi: Aku jadi pembeli, kamu jadi penjual, Sesilia!']}]},
+
+{t:'Level 3: Game Stage',st:'Game Stage',a:'17 tahun',nb:'Sesilia belajar di sekolah dan terpengaruh gaya hidup di media sosial.',s:.95,sky:0xb8e2ff,g:0xb7c9a8,sx:0,sz:0,ok:0,
+story:'Sesilia remaja kini bersekolah. Pagi hari ia belajar dari Bu Guru, sorenya ia melihat gaya selebgram di kantin. Temui keduanya.',
+ins:'Game Stage: remaja memahami peran banyak pihak dan aturan bersama, seperti dalam pertandingan.',
+pc:{sh:0xffffff,pa:0x8a8f9a,sk:0x8a8f9a,tie:1,bag:1},
+b(){gr(0xb7c9a8);B(-8,0,-9,12,.05,10,0xe8e0c8);
+wall(-14,-14,-2,-14,4,0xfdf3d0);wall(-14,-14,-14,-4,4,0xfdf3d0);wall(-2,-14,-2,-4,4,0xfdf3d0);wall(-14,-4,-9.2,-4,4,0xfdf3d0);wall(-6.8,-4,-2,-4,4,0xfdf3d0);
+B(-8,1,-13.7,5,1.8,.1,0x1f5a3a);B(-8,0,-11.5,2,.8,1,0x8b5a2b,1);
+[-12,-8,-4].forEach(x=>[-9,-7].forEach(z=>B(x,0,z,1.8,.75,.8,0xd4a373,1)));
+B(10,0,-8,10,.05,7,0xf3e0b5);B(10,0,-10.5,8,1.1,1,0xe07a5f,1);B(8,0,-7,2,.8,1,0x8b5a2b,1);B(12.5,0,-7,2,.8,1,0x8b5a2b,1);
+B(0,0,8,16,.03,10,0x4a90c2);B(-7.5,0,8,.2,3,.2,0x555555,1);B(-7.5,3,8,.3,1,1.2,0xffffff);B(7.5,0,8,.2,3,.2,0x555555,1);B(7.5,3,8,.3,1,1.2,0xffffff);
+B(0,0,-1,.2,6,.2,0xcccccc,1);B(.7,5,-1,1.4,.9,.05,0xe63946);
+B(0,0,-25,40,9,6,0xf4c6c6,1);for(let i=-6;i<=6;i+=2)B(i*3,3,-21.95,1.8,1.6,.1,0x7ec8f0);B(0,0,-21.95,2.4,2.6,.1,0x6b3f1d);sign('SMA',0,7.6,-21.9,7,2.4,'#1d4ed8');[[-18,4],[18,4],[-20,-12],[20,-14]].forEach(p=>tree(...p))},
+n:[{x:-6,z:-12.3,r:.5,o:{sh:0x6d597a,pa:0x355070,h:0x1a1a1a,sk:0x6d597a},n:'Bu Guru',m:'Belajar dari Bu Guru',
+l:['Bu Guru: Selamat pagi, anak-anak. Hari ini ujian. Ingat, jangan mencontek!','Bu Guru: Kejujuran itu aturan sekolah dan bekal hidup kalian.','Sesilia mengerjakan ujian dengan jujur.'],q:['sekolah3']},
+{x:10,z:-5,r:3.1,o:{sh:0xff4d8d,pa:0x222222,h:0xc77d1f,sk:0xff4d8d,bow:0},n:'Kak Nadia (selebgram)',m:'Lihat gaya selebgram',
+l:['Sore hari, Sesilia melihat unggahan Kak Nadia di media sosial.','Kak Nadia: Cek outfit hari ini! Gaya begini lagi tren banget.','Sesilia jadi ingin berpakaian seperti idolanya.'],q:['media3']}]},
+
+{t:'Level 4: Generalized Other',st:'Generalized Other',a:'25 tahun',nb:'Sesilia bekerja dan ikut gotong royong serta arisan di lingkungannya.',s:1.05,sky:0xaee0ff,g:0xa8d98f,sx:0,sz:9,ok:0,
+story:'Sesilia kini dewasa dan bekerja. Di lingkungannya, ia ikut gotong royong dan arisan. Temui Pak RT dan Bu Ani.',
+ins:'Generalized Other: individu memahami harapan dan norma masyarakat luas.',
+pc:{sh:0x2a9d8f,pa:0x264653},
+b(){gr(0xa8d98f);B(0,0,3,80,.03,6,0x5c6269);for(let i=-3;i<=3;i++)B(i*.9,.03,3,.5,.02,5,0xffffff);
+B(-14,0,-12,12,7,7,0x7aa2c7,1);sign('KANTOR',-14,7.6,-8.35,6,1.8,'#1d3557');B(-14,0,-8.45,2,2.8,.1,0x1d3557);
+B(12,0,-10,9,.1,7,0xe6c79c);[[7.8,-6.8],[16.2,-6.8],[7.8,-13.2],[16.2,-13.2]].forEach(p=>B(p[0],0,p[1],.4,3,.4,0x8b5a2b,1));
+B(12,.1,-11,3,.8,1.2,0x8b5a2b,1);sign('ARISAN',12,3.4,-6.7,6,1.6,'#b5533c');
+B(10,0,13,6,.05,5,0x4aa3df);B(4,0,12,2,.5,.8,0x8b5a2b,1);
+B(-6,0,8,.3,2.6,.3,0x666666,1);B(-9,0,8,.3,2.6,.3,0x666666,1);B(-7.5,2.6,8,3.6,.2,2,0xe63946);
+B(-6,0,-2,.8,1,.8,0x2a9d8f,1);B(-5,0,-3,.3,1.4,.3,0xa0522d);
+[0,8,-8].forEach(x=>B(x,0,0,.2,3,.2,0x444444,1));
+[[-20,10],[20,8],[-22,-2],[22,-2],[0,-18]].forEach(p=>tree(...p))},
+n:[{x:-3,z:-1,r:.5,o:{sh:0xf4d35e,pa:0x3d405b,h:0x333333},n:'Pak RT',m:'Ikut gotong royong',
+l:['Pak RT: Sesilia, hari Minggu ini kita kerja bakti membersihkan lingkungan.','Sesilia: Siap, Pak! Saya ikut membersihkan got dan jalan.','Warga bekerja bersama dengan semangat gotong royong.'],q:['lingk4']},
+{x:12,z:-8,r:3.1,o:{sh:0xb56576,pa:0x6d597a,h:0x222222,sk:0xb56576},n:'Bu Ani',m:'Ikut arisan warga',
+l:['Bu Ani: Silakan duduk, Sesilia! Arisan RT kita mulai.','Sesilia mengobrol dengan tetangga dan menyetor iuran arisan.','Setelah pulang kerja, Sesilia terus belajar peran barunya di masyarakat.'],q:['sek4']}]}];
+
+const LM={sky:0xbfe8ff,g:0x8fdc7a,sx:0,sz:0,n:[],b(){gr(0x8fdc7a);B(0,0,-5,90,.04,5,0x8d939c);B(0,0,-2.3,90,.06,.8,0xe3dcc8);
+[[-18,0xf7a8c4,0x7b5cd6],[-8,0xffd36e,0xe5484d],[4,0xa5d8ff,0xf08a4b],[16,0xd6b4ff,0x3ba7a0]].forEach((h,i)=>{B(h[0],0,-14,8,5+i%2,6,h[1],1);roof(h[0],5+i%2,-14,8.6,6.6,2.6,h[2]);B(h[0],0,-10.95,1.4,2.4,.1,0x7a4b2a);B(h[0]+2.4,1.6,-10.95,1.4,1.3,.1,0x7ec8f0)});
+B(-5,0,-1,2.2,.5,.8,0x8b5a2b,1);B(-5,.5,-1.4,2.2,.6,.15,0x8b5a2b);
+[[-13,-9.5],[-2,-9.5],[10,-9.5],[22,-9.5],[-24,-1],[18,-1],[8,7],[-14,7]].forEach(p=>tree(...p))}};
+const SP=[[[-2,-2],[5,3],[-4,4],[0,10]],[[-5,0],[6,-2],[0,7],[-4,-6]],[[0,-2],[6,2],[-6,2],[12,-3]],[[0,8],[6,-2],[-8,-4],[12,3]]];
+/* ---------- load level ---------- */
+function load(n,cb){st='load';run=false;lt=0;$('tmr').textContent='03:00';$('load').classList.remove('hidden');
+setTimeout(()=>{if(world)S.remove(world);if(pl)S.remove(pl);world=new T.Group();S.add(world);cols=[];npcs=[];
+const L=n<0?LM:LV[n];S.background=new T.Color(L.sky);S.fog=new T.Fog(L.sky,35,95);L.b();
+cloud=[];for(let i=0;i<7;i++)cloud.push(B(-50+i*17,26,-30+(i%3)*20,9,2,4,0xffffff));
+L.n.forEach(d=>{const m=chr({...d.o,s:1.05});m.position.set(d.x,0,d.z);m.rotation.y=d.r;world.add(m);
+d.g=m;if(d.q){d.done=false;const k=new T.Mesh(new T.OctahedronGeometry(.3),new T.MeshBasicMaterial({color:0xffe14d}));k.position.y=2.9;m.add(k);d.k=k}npcs.push(d)});
+pk=0;stars=(n<0?[]:SP[n]).map(q=>{const m=new T.Mesh(new T.OctahedronGeometry(.32),new T.MeshBasicMaterial({color:0xffd23f}));m.position.set(q[0],1,q[1]);world.add(m);return{m,x:q[0],z:q[1]}});mkPl();P.x=L.sx;P.z=L.sz;P.y=0;P.vy=0;yaw=0;pit=.4;
+hud();$('load').classList.add('hidden');setTrack(n<0?0:n);cb&&cb()},350)}
+
+function mkPl(m){if(pl)S.remove(pl);const L=LV[lv],o=m?{sh:0xffffff,pa:0x2e4a8a,sk:0x2e4a8a,tie:1,s:1.15}:{...L.pc,s:L.s};pl=chr(G=='m'?{...o,sk:0,sh:o.sh==0xff8fb8?0x4cc9f0:o.sh,pa:m?0x2e4a8a:[0xffd54a,0x3a6ea5,0x8a8f9a,0x264653][lv],h:0x2b1a10,bow:0,long:0}:{...o,h:0x3b2314,bow:1,long:1});S.add(pl);P.s=o.s;pit=m?.12:.4}
+function rt(){const N=['Preparatory','Play','Game','Gen. Other'],L=LV[lv],k=lv,left=3-k;$('tk').innerHTML=`<div class="flex items-start gap-1"><div class="pt-0.5 text-[10px] sm:text-xs font-extrabold text-emerald-600 text-center leading-tight">START<br>⚑</div><div class="relative flex-1 flex justify-between"><i class="absolute left-7 right-7 top-[11px] h-1.5 rounded bg-slate-200"></i><i class="absolute left-7 top-[11px] h-1.5 rounded bg-emerald-400" style="width:calc((100% - 3.5rem)*${k/3})"></i>${N.map((n,i)=>`<div class="relative z-10 flex flex-col items-center w-14"><div class="w-7 h-7 rounded-full border-4 flex items-center justify-center text-[11px] font-extrabold ${i<k?'bg-emerald-400 border-emerald-500 text-white':i==k?'bg-yellow-300 border-orange-400 text-slate-800 scale-125':'bg-white border-slate-300 text-slate-400'}">${i<k?'✓':i+1}</div><div class="mt-1 text-[9px] sm:text-[11px] font-bold leading-tight text-center ${i==k?'text-slate-800':'text-slate-500'}">${n}</div></div>`).join('')}</div><div class="pt-0.5 text-[10px] sm:text-xs font-extrabold text-rose-600 text-center leading-tight">FINISH<br>⚑</div></div>`}
+function hud(){const L=LV[lv];
+$('hu').innerHTML=`<div class="relative w-12 h-12 rounded-xl bg-sky-200 overflow-hidden shrink-0"><i class="absolute ${G=='m'?'inset-x-2 top-0.5 h-6':'inset-x-1 top-1 h-9'} rounded-t-full bg-[#3b2314]"></i><i class="absolute left-2.5 right-2.5 top-3 bottom-1 rounded-2xl bg-[#f1c27d]"></i><i class="absolute left-4 top-6 w-1 h-1.5 rounded bg-slate-800"></i><i class="absolute right-4 top-6 w-1 h-1.5 rounded bg-slate-800"></i>${G=='m'?'':'<i class="absolute left-0.5 top-1.5 w-2.5 h-2.5 rounded bg-pink-500"></i>'}</div><div><div>Umur : ${L.a}</div><div>Tahap : ${L.st}</div><div>Skor : ${score+bonus} <span class="text-yellow-400">★</span></div></div>`;$('nb').textContent=L.nb;rt();
+$('ms').innerHTML=`<div class="font-extrabold mb-1">Misi</div>`+L.n.filter(d=>d.q).map(d=>`<div class="${d.done?'text-emerald-600 line-through':''}">${d.done?'✔':'○'} ${d.m}</div>`).join('')+`<div class="text-amber-600 mt-1">★ Bintang: ${pk}/${stars.length}</div>`}
+const fmt=t=>String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0');
+
+/* ---------- overlay & alur ---------- */
+const btn='mt-4 w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold rounded-full py-3';
+function ov(h,m){const o=$('ov');o.className='fixed inset-0 z-30 flex p-3 overflow-y-auto '+(m=='q'?'items-end sm:items-center justify-center sm:justify-end sm:pr-8 pointer-events-none':m=='c'?'items-center justify-center':m=='m'?'items-start sm:items-center justify-center sm:justify-start sm:pl-[6%]':'items-center justify-center bg-black/40');
+o.innerHTML=m=='c'?`<div class="w-full max-w-xl text-center">${h}</div>`:m=='m'?`<div class="w-full max-w-md text-center sm:text-left">${h}</div>`:`<div class="pointer-events-auto relative w-full ${m=='q'?'max-w-md mt-8 border-pink-400':'max-w-lg my-auto border-sky-300'} bg-white rounded-3xl shadow-2xl p-5 border-4">${h}</div>`}
+const cl=()=>$('ov').classList.add('hidden');
+const ui=v=>['hu','tm','pz','nb','ms','tk'].forEach(i=>$(i).style.display=v?'':'none');
+const NKO={f:{sh:0xff4d8d,pa:0x222222,h:0xc77d1f,sk:0xff4d8d,bow:0},m:{sh:0x2563eb,pa:0x222222,h:0x3b2a1a,bow:0}};
+let PK=[];
+function pickChars(on){PK.forEach(c=>S.remove(c));PK=[];if(on){PK=[chr({sh:0xffffff,pa:0x2e4a8a,tie:1,h:0x2b1a10,s:1.4}),chr({sh:0xffffff,pa:0x2e4a8a,sk:0x2e4a8a,tie:1,h:0x3b2314,bow:1,long:1,s:1.4})];PK[0].rotation.y=.35;PK[1].rotation.y=-.35;PK.forEach(c=>S.add(c))}}
+function walk(o){for(const k in o){const v=o[k];if(typeof v=='string')o[k]=v.replace(/Sesilia|Susilo/g,NM).replace(/Nadia|Raka/g,NK);else if(v&&typeof v=='object'&&!v.isObject3D&&k!='g'&&k!='k')walk(v)}}
+function pickG(g){G=g;NM=g=='m'?'Susilo':'Sesilia';NK=g=='m'?'Raka':'Nadia';document.body.classList.toggle('m',g=='m');LV[2].n[1].o=NKO[g];[LV,Q,MT,RQ].forEach(walk);document.title=NM+'’s Journey';$('sbt').textContent='Hi. Aku '+NM+'. Ayo Ikuti Perjalanan Hidupku.';sfx('pick');menu()}
+function pick(){st='pick';P.s=1;pit=.2;pickChars(1);document.body.classList.remove('m');ui(false);pl.visible=false;const b='rounded-3xl py-4 text-white font-extrabold text-2xl shadow-[0_6px_0_rgba(0,0,0,.25)] ';
+ov(`<h1 class="bx" aria-label="Soblox Journey"><span class="bxw">S<i class="sq r"></i>BL<i class="sq"></i>X</span><span class="bxj">JOURNEY</span></h1><div class="inline-block mt-5 bg-blue-600 text-white font-extrabold rounded-xl px-4 py-1.5 shadow-lg border-2 border-white text-sm sm:text-base">Pilih karakter kamu</div><div class="grid grid-cols-2 gap-4 max-w-sm mx-auto mt-6"><button class="${b}bg-sky-500" onclick="pickG('m')">Laki-laki<div class="text-sm font-bold opacity-90">Susilo</div></button><button class="${b}bg-pink-500" onclick="pickG('f')">Perempuan<div class="text-sm font-bold opacity-90">Sesilia</div></button></div>`,'c')}
+function menu(){pickChars(0);st='menu';ui(false);mkPl(true);const b='w-full rounded-full py-3 text-white font-extrabold text-xl shadow-[0_5px_0_rgba(0,0,0,.25)] mt-3 ';
+ov(`<h1 class="logo text-6xl sm:text-8xl ${G=='m'?'text-blue-500':'text-pink-500'} leading-[.95]" style="${G=='m'?'text-shadow:0 5px 0 #1e3a8a':''}">${NM}’s<br><span class="text-yellow-300">Journey</span></h1><div class="inline-block mt-5 bg-blue-600 text-white font-extrabold rounded-xl px-4 py-1.5 shadow-lg border-2 border-white text-sm sm:text-base">Jelajahi Perjalanan Hidup, Pahami Sosialisasi!</div><div class="mt-4 sm:mt-8 max-w-[16rem] mx-auto sm:mx-0"><button class="${b}bg-pink-500" onclick="load(0,()=>intro(0))">▶ Mulai Game</button><button class="${b}bg-blue-500" onclick="about()">Tentang Materi</button><button class="${b}bg-violet-500" onclick="setg()">Pengaturan</button><button class="${b}bg-slate-500 !text-base !py-2" onclick="pick()">Ganti Karakter</button></div>`,'m')}
+function about(){ov(`<h2 class="text-2xl font-extrabold text-pink-600">Tentang Materi</h2><p class="mt-2 text-slate-700 text-sm"><b>Tahap Sosialisasi (George Herbert Mead):</b> Preparatory, Play, Game, dan Generalized Other.<br><b>Agen Sosialisasi:</b> keluarga, teman sebaya, sekolah, media massa, lingkungan masyarakat.<br><b>Bentuk Sosialisasi:</b> primer (informal) dan sekunder (formal).</p><button class="${btn}" onclick="menu()">Kembali</button>`)}
+function setg(g){const sl=(n,v,k)=>`<label class="block mt-3 font-bold text-slate-700 text-sm">${n}<input type="range" min="0" max="100" value="${Math.round(v*100)}" class="w-full accent-pink-500" oninput="${k}=this.value/100;av()" onchange="sfx('pick')"></label>`,q=g?1:0;
+ov(`<h2 class="text-2xl font-extrabold text-pink-600">Pengaturan</h2>${sl('Volume musik',vM,'vM')}${sl('Volume efek suara',vS,'vS')}<button class="${btn}" onclick="mut=!mut;av();setg(${q})">${mut?'Suara: Mati (nyalakan)':'Suara: Hidup (bisukan)'}</button><button class="${btn}" onclick="sun.castShadow=!sun.castShadow;setg(${q})">Bayangan: ${sun.castShadow?'Hidup':'Mati'}</button><button class="${btn} !bg-violet-500" onclick="${g?'closeA()':'menu()'}">${g?'Tutup':'Kembali'}</button>`)}
+function openA(){if(st=='menu')setg();else if(st=='play'){st='aud';run=false;setg(1)}}
+function closeA(){cl();st='play';run=true}
+function pause(){if(st!='play')return;st='pause';run=false;pauseM();ov(`<h2 class="text-2xl font-extrabold text-violet-600">Permainan dijeda</h2><button class="${btn}" onclick="cl();st='play';run=true;resumeM()">Lanjutkan</button><button class="${btn} !bg-violet-500" onclick="restart()">Keluar ke Menu</button>`)}
+const MT=[
+{n:'Preparatory Stage – Tahap Persiapan',w:'Sejak manusia dilahirkan hingga masa kanak-kanak awal.',k:'Anak mulai mempersiapkan diri untuk mengenal dunia sosial.',p:'Anak meniru (imitation) orang-orang di sekitarnya, misalnya ucapan atau gestur orang tua. Tiruan ini belum sempurna dan belum dipahami maksudnya secara mendalam.'},
+{n:'Play Stage – Tahap Meniru',k:'Anak mulai bisa mengambil peran yang dijalankan orang dewasa di sekitarnya secara lebih sempurna.',p:'Anak mulai menyadari keberadaan dirinya (self-awareness) dan memahami peran orang lain. Ditandai dengan bermain peran (role-playing), seperti berpura-pura menjadi dokter, guru, atau ibu.'},
+{n:'Game Stage – Tahap Siap Bertindak',k:'Peniruan mulai berkurang dan digantikan pemahaman yang lebih nyata tentang peran diri sendiri di tengah orang lain.',p:'Anak mampu memahami peran yang kompleks, berpartisipasi dalam kerja sama, dan menaati aturan main yang disepakati bersama dalam kelompok atau lingkungan luar rumah, seperti teman sebaya.'},
+{n:'Generalized Other Stage – Tahap Penerimaan Norma Kolektif',k:'Tahap paling matang, saat individu telah mencapai kedewasaan penuh.',p:'Seseorang tidak hanya menyesuaikan diri dengan orang tertentu di sekitarnya, tetapi mampu menempatkan diri terhadap nilai, norma, dan harapan masyarakat secara luas (generalized other).'}];
+function intro(n){lv=n;st='intro';ui(true);rt();if(n>0)sfx('new');mkPl();const L=LV[n],m=MT[n],r=(a,b)=>b?`<p class="mt-1.5"><b class="text-sky-700">${a}:</b> ${b}</p>`:'';
+ov(`<div class="text-sm font-bold text-sky-600">Umur ${NM}: ${L.a}</div><h2 class="text-2xl font-extrabold ${G=='m'?'text-blue-600':'text-pink-600'}">${L.t}</h2>
+<div class="mt-3 bg-yellow-50 border-2 border-yellow-300 rounded-2xl p-3 text-sm text-slate-700"><div class="flex items-center gap-2 font-extrabold text-slate-800"><svg viewBox="0 0 24 24" class="w-6 h-6 shrink-0"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" fill="#fbbf24"/><rect x="9" y="18" width="6" height="2" rx="1" fill="#94a3b8"/><rect x="10" y="21" width="4" height="1.6" rx=".8" fill="#94a3b8"/></svg>${m.n}</div>${r('Usia/waktu',m.w)}${r('Karakteristik',m.k)}${r('Perilaku',m.p)}</div>
+<p class="mt-3 text-slate-700"><b class="${G=='m'?'text-blue-600':'text-pink-600'}">Action :</b> ${L.story}</p>
+<button class="${btn}${G=='m'?' !bg-blue-500 hover:!bg-blue-600':''}" onclick="play()">Mulai Level</button>`)}
+function play(){cl();st='play';run=true}
+function act(){if(st=='dlg'){di++;di<dl.length?showD():endD()}else if(st=='play'&&near)talk(near)}
+function talk(d){sfx('talk');cur=d;st='dlg';di=0;dl=d.done?['Terima kasih sudah mengobrol, '+NM+'!']:d.l;$('dn').textContent=d.n;showD();$('dlg').classList.remove('hidden');$('pr').classList.add('hidden')}
+function showD(){$('dt').textContent=dl[di]}
+function endD(){$('dlg').classList.add('hidden');if(cur.q&&!cur.done){mgq()}else st='play'}
+function pop(x,y,z,c){for(let i=0;i<12;i++){const m=new T.Mesh(new T.OctahedronGeometry(.1),new T.MeshBasicMaterial({color:c})),a=Math.random()*6.28;m.position.set(x,y,z);m.userData={vx:Math.cos(a)*2.5,vy:3+Math.random()*2,vz:Math.sin(a)*2.5,l:.7};S.add(m);PT.push(m)}}
+const MGC=['bg-rose-400','bg-sky-400','bg-yellow-300','bg-emerald-400'];
+function mini(){st='mini';const n=3+lv;mgs={q:Array.from({length:n},()=>Math.random()*4|0),i:0,on:0};
+ov(`<div class="text-center"><div class="text-sm font-bold text-sky-600">Mini Game</div><h2 class="text-2xl font-extrabold text-pink-600">Ayo Fokus</h2><p id="mt" class="mt-1 text-slate-700 text-sm font-bold">Perhatikan urutan warna…</p><div class="grid grid-cols-2 gap-3 mt-4 max-w-[14rem] mx-auto">${MGC.map((c,i)=>`<button id="mb${i}" onclick="mgp(${i})" class="h-20 rounded-2xl ${c} border-4 border-white shadow opacity-60 transition-transform"></button>`).join('')}</div><button id="mn" class="${btn} hidden" onclick="mgq()">Lanjut ke Kuis</button></div>`);
+mgs.q.forEach((s,k)=>setTimeout(()=>mgf(s),800+k*700));setTimeout(()=>{if(st=='mini'){mgs.on=1;$('mt').textContent='Giliranmu! Ulangi urutannya.'}},800+n*700)}
+function mgf(i){if(st!='mini')return;const b=$('mb'+i);if(!b)return;b.style.opacity=1;b.style.transform='scale(1.12)';sfx('pick');setTimeout(()=>{b.style.opacity='';b.style.transform=''},350)}
+function mgp(i){if(!mgs||!mgs.on)return;mgf(i);if(i!=mgs.q[mgs.i]){mgs.on=0;$('mt').textContent='Belum pas, tidak apa-apa! Lanjut ke kuis.';sfx('bad');$('mn').classList.remove('hidden')}else if(++mgs.i==mgs.q.length){mgs.on=0;bonus+=50;hud();pop(P.x,P.y+2,P.z,0xffd23f);sfx('lvl',.2);$('mt').textContent='Hebat! Bonus +50 ★';$('mn').classList.remove('hidden')}}
+function mgq(){cq=cur.q.map(k=>Q[k]);qi=0;st='quiz';showQ()}
+let ix=[];
+function qh(sel){const q=cq[qi],L='ABC';
+return `<div class="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-pink-500 text-white font-extrabold rounded-full px-8 py-1 shadow border-2 border-white">Kuis Yuk! ${qi+1}/${cq.length}</div><h3 class="text-lg font-extrabold text-slate-800 text-center mt-3">${q.q}</h3>`+ix.map((i,k)=>{const c=sel<0?'bg-slate-100 border-slate-200':i==0?'bg-green-300 border-green-500':i==sel?'bg-rose-200 border-rose-400':'bg-slate-100 border-slate-200';
+return `<button ${sel<0?`onclick="ans(${i})"`:'disabled'} class="mt-2 w-full flex items-center gap-2 text-left border-2 rounded-full px-3 py-2 font-bold text-slate-700 ${c}"><span class="shrink-0 w-7 h-7 rounded-full bg-white border-2 border-slate-300 text-center text-sm leading-6">${L[k]}</span><span class="flex-1 text-sm">${q.o[i]}</span>${sel>=0&&i==0?'<b class="text-green-700">✔</b>':''}${sel==i&&i!=0?'<b class="text-rose-600">✖</b>':''}</button>`}).join('')}
+function showQ(){ix=[0,1,2].sort(()=>Math.random()-.5);ov(qh(-1),'q')}
+function ans(i){const q=cq[qi],ok=i==0;res[cur.q[qi]]=ok;if(ok){score+=100;LV[lv].ok++}sfx(ok?'ok':'bad');if(ok){sfx('pt',.22);pop(P.x,P.y+2,P.z,0x4ade80)}hud();
+ov(qh(i)+`<div class="mt-3 bg-yellow-100 border-2 border-yellow-300 rounded-2xl p-3 text-sm text-slate-800"><b>${ok?'Benar! +100 poin. ':'Belum tepat. '}</b>${q.e}</div><button class="${btn}" onclick="fb()">Lanjut</button>`,'q')}
+function fb(){qi++;if(qi<cq.length)return showQ();cur.done=true;cur.k.visible=false;hud();sfx('mis');
+if(LV[lv].n.filter(d=>d.q).every(d=>d.done)){const L=LV[lv];st='end';sfx('lvl',.7);ov(`<h2 class="text-2xl font-extrabold text-emerald-600">${L.t} selesai!</h2><p class="mt-2 text-slate-700">${L.ins}</p><button class="${btn}" onclick="go()">${lv<3?'Lanjut ke level berikutnya':'Lihat Rapor Akhir'}</button>`)}else{cl();st='play'}}
+function go(){if(lv<3){lv++;load(lv,()=>intro(lv))}else report()}
+function report(){run=false;st='end';sfx('win');const pct=Math.round(score/800*100),g=ks=>ks.filter(k=>res[k]).length/ks.length>=.6,
+rows=[['Tahap Sosialisasi',true],['Agen Sosialisasi',g(['agen1','agen2','sekolah3','media3','lingk4'])],['Bentuk Sosialisasi',g(['bentuk1','fungsi2','sek4'])]],
+v=pct>=75?['Selamat!',NM+' tumbuh menjadi individu yang terintegrasi dengan baik di masyarakat.','text-orange-500']:pct>=50?['Cukup baik!',NM+' cukup terintegrasi. Ulangi bagian yang masih keliru.','text-amber-500']:['Ayo coba lagi!','Pemahaman agen dan bentuk sosialisasi perlu diperkuat.','text-rose-500'];
+ov(`<div class="bg-violet-500 text-white rounded-2xl px-4 py-2 flex items-center gap-2 justify-center text-2xl font-extrabold"><svg viewBox="0 0 40 40" class="w-9 h-9"><path d="M12 6h16v10a8 8 0 0 1-16 0z" fill="#fbbf24"/><path d="M12 9H6c0 6 3 9 7 9M28 9h6c0 6-3 9-7 9" stroke="#f59e0b" stroke-width="2.5" fill="none"/><rect x="18" y="22" width="4" height="6" fill="#f59e0b"/><rect x="12" y="28" width="16" height="5" rx="2" fill="#d97706"/></svg>Rapor Akhir</div>
+<div class="text-center text-3xl font-extrabold mt-3 ${v[2]}">${v[0]}</div><p class="text-center text-slate-700 text-sm">${v[1]}</p>
+<div class="text-center font-extrabold mt-2">Skor Akhir: ${score+bonus} <span class="text-yellow-400">★</span> <span class="text-sm font-bold text-slate-500">(${pct}% · ${fmt(tm)})</span></div>
+<div class="mt-3 bg-slate-50 rounded-2xl p-3 text-sm">${rows.map(r=>`<div class="flex items-center gap-2 py-1"><b class="w-5 h-5 rounded text-white text-center text-xs leading-5 ${r[1]?'bg-green-500':'bg-amber-500'}">${r[1]?'✔':'!'}</b>${r[0]}: <b>${r[1]?'Lengkap':'Perlu diulang'}</b></div>`).join('')}</div>
+<div class="flex gap-2 mt-4"><button class="flex-1 bg-green-500 text-white font-extrabold rounded-full py-3" onclick="restart(1)">Main Lagi</button><button class="flex-1 bg-violet-500 text-white font-extrabold rounded-full py-3" onclick="refl()">Refleksi</button></div>`)}
+const RQ=[
+{q:'Dari perjalanan hidup Sesilia tadi, tahap apa saja yang sudah dilaluinya dan action apa yang Sesilia perlihatkan?',g:[['preparatory stage','persiapan'],['mamam','mama'],['play stage','meniru'],['masak','berpura','berbagi','dina'],['game stage','siap bertindak'],['ujian','jujur','contek','selebgram','media sosial'],['generalized other','penerimaan norma kolektif'],['kerja bakti','arisan','menyesuaikan','kebiasaan','tempat kerja']],n:['Preparatory Stage / Persiapan','Action: menirukan kata “mamam” dari Ibu di rumah','Play Stage / Meniru','Action: bermain masak-masakan, berpura-pura jadi ibu, berbagi dengan Dina','Game Stage / Siap Bertindak','Action: mengerjakan ujian dengan jujur di sekolah, terpengaruh gaya selebgram di media sosial','Generalized Other / Penerimaan Norma Kolektif','Action: ikut kerja bakti, arisan, menyesuaikan diri di tempat kerja dan lingkungan'],e:[
+'Sesilia melewati <b>4 tahap</b>. Intinya, ia berkembang dari sekadar meniru menjadi paham aturan masyarakat.',
+'<b>1. Preparatory Stage (Tahap Persiapan), usia 1 tahun.</b> Anak meniru orang terdekat tanpa tahu artinya. <i>Action Sesilia:</i> menirukan kata “mamam” dari Ibu di rumah.',
+'<b>2. Play Stage (Tahap Meniru), usia 7 tahun.</b> Anak mulai paham bahwa orang lain punya peran, lalu mencobanya lewat permainan. <i>Action Sesilia:</i> bermain masak-masakan, berpura-pura jadi ibu, dan berbagi mainan dengan Dina.',
+'<b>3. Game Stage (Tahap Siap Bertindak), usia 17 tahun.</b> Seperti pemain dalam pertandingan, remaja paham peran banyak pihak dan aturan yang disepakati bersama. <i>Action Sesilia:</i> mengerjakan ujian dengan jujur tanpa mencontek, dan mulai terpengaruh gaya selebgram di media sosial.',
+'<b>4. Generalized Other (Penerimaan Norma Kolektif), usia 25 tahun.</b> Seseorang sudah paham nilai, norma, dan harapan masyarakat luas, bukan hanya orang tertentu. <i>Action Sesilia:</i> ikut kerja bakti, arisan, dan menyesuaikan diri dengan kebiasaan di tempat kerja dan lingkungannya.']},
+{q:'Agen sosialisasi apa saja yang memengaruhi Sesilia?',g:[['keluarga'],['teman sebaya','sebaya','teman'],['sekolah'],['media sosial','media massa','media'],['lingkungan masyarakat','masyarakat','lingkungan']],n:['Keluarga','Teman sebaya','Sekolah','Media sosial / media massa','Lingkungan masyarakat'],e:[
+'<b>Agen sosialisasi</b> adalah pihak yang membantu kita belajar nilai dan norma. Di game ini ada 5:',
+'<b>Keluarga:</b> agen pertama dan utama. Sesilia belajar bahasa dan perilaku dasar dari Ibu.',
+'<b>Teman sebaya:</b> hubungan setara dengan teman seumuran. Sesilia belajar berbagi dan bekerja sama bersama Dina.',
+'<b>Sekolah:</b> punya aturan, kurikulum, dan sanksi resmi. Bu Guru menanamkan kejujuran dan disiplin.',
+'<b>Media sosial / media massa:</b> menyebarkan tren dan gaya hidup ke banyak orang, misalnya gaya Kak Nadia. Dampaknya bisa positif atau negatif, jadi kita harus selektif.',
+'<b>Lingkungan masyarakat:</b> menanamkan norma tempat tinggal, seperti gotong royong bersama Pak RT dan warga.']},
+{q:'Apa bentuk sosialisasi yang dialami Sesilia di tiap lingkungannya?',g:[['primer'],['sekunder'],['rumah','keluarga'],['sekolah'],['lingkungan','masyarakat','kerja','arisan','teman','media']],n:['Primer','Sekunder','Di rumah / keluarga','Di sekolah','Di lingkungan masyarakat / kerja / pergaulan'],e:[
+'Bentuk sosialisasi dibedakan berdasarkan <b>kapan</b> dan <b>di mana</b> proses belajar terjadi.',
+'<b>Sosialisasi primer (informal):</b> terjadi lebih dulu, di rumah bersama keluarga, secara alami tanpa aturan resmi. Contoh: Ibu mengajarkan “mamam” lewat obrolan sehari-hari.',
+'<b>Sosialisasi sekunder:</b> terjadi setelah primer, di luar keluarga, saat kita belajar peran dan norma baru. Contoh: di sekolah (formal, ada aturan dan sanksi), bersama teman, lewat media, di tempat kerja, dan di lingkungan masyarakat seperti kerja bakti dan arisan.']}];
+function refl(){st='refl';ov(`<div class="bg-violet-500 text-white rounded-2xl px-4 py-2 text-center text-2xl font-extrabold">Refleksi</div><p class="mt-2 text-sm text-slate-600">Jawab singkat dengan kalimatmu sendiri. Setiap jawaban bernilai maksimal 10.</p>${RQ.map((x,i)=>`<label class="block mt-3 font-bold text-slate-700 text-sm">${i+1}. ${x.q}<textarea id="ra${i}" rows="3" class="mt-1 w-full rounded-2xl border-2 border-slate-300 p-2 font-normal" placeholder="Tulis jawabanmu di sini…"></textarea></label>`).join('')}<button class="${btn}" onclick="rsub()">Kirim Jawaban</button>`)}
+function rsub(){sfx('mis');const a=RQ.map((x,i)=>{const t=$('ra'+i).value.toLowerCase().replace(/\s+/g,' ').replace(/menirukan/g,' '),f=x.g.map(g=>g.some(w=>t.includes(w)));return{f,p:Math.round(10*f.filter(Boolean).length/x.g.length)}}),tot=a.reduce((s,x)=>s+x.p,0);
+ov(`<div class="bg-violet-500 text-white rounded-2xl px-4 py-2 text-center text-2xl font-extrabold">Hasil Refleksi</div><div class="text-center text-3xl font-extrabold mt-3 ${tot>=24?'text-emerald-500':tot>=15?'text-amber-500':'text-rose-500'}">${tot} / ${RQ.length*10}</div>${RQ.map((x,i)=>`<div class="mt-3 bg-slate-50 rounded-2xl p-3 text-sm text-slate-700"><div class="font-extrabold">${i+1}. Nilai: ${a[i].p}/10</div>${x.n.map((w,j)=>`<div><b class="${a[i].f[j]?'text-green-600':'text-rose-500'}">${a[i].f[j]?'✔':'✖'}</b> ${w}</div>`).join('')}<div class="mt-2 pt-2 border-t border-slate-200 text-slate-700"><div class="font-extrabold text-amber-600">Pembahasan</div>${x.e.map(t=>`<p class="mt-1">${t}</p>`).join('')}</div></div>`).join('')}<div class="flex gap-2 mt-4"><button class="flex-1 bg-green-500 text-white font-extrabold rounded-full py-3" onclick="restart(1)">Main Lagi</button><button class="flex-1 bg-violet-500 text-white font-extrabold rounded-full py-3" onclick="restart()">Keluar</button></div>`)}
+function restart(a){resumeM();Object.keys(res).forEach(k=>delete res[k]);score=bonus=0;tm=0;LV.forEach(l=>l.ok=0);lv=0;load(a?0:-1,a?()=>intro(0):menu)}
+
+/* ---------- kontrol ---------- */
+addEventListener('keydown',e=>{if(e.target.tagName=='TEXTAREA')return;const k=e.key.toLowerCase();if(k==' '||k.startsWith('arrow'))e.preventDefault();if(!e.repeat&&(k=='e'||k==' ')&&(st=='dlg'||(st=='play'&&near)))act();else if(k==' ')jump=true;keys[k]=1});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
+let drag=null,jx=0,jy=0;const cv=$('c');
+cv.addEventListener('pointerdown',e=>{if(!drag){drag={id:e.pointerId,x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId)}});
+cv.addEventListener('pointermove',e=>{if(drag&&drag.id==e.pointerId){yaw-=(e.clientX-drag.x)*.006;pit=Math.max(.1,Math.min(1.2,pit+(e.clientY-drag.y)*.005));drag.x=e.clientX;drag.y=e.clientY}});
+['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,e=>{if(drag&&drag.id==e.pointerId)drag=null}));
+const jo=$('joy'),jk=$('jk');
+function jm(e){const r=jo.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,m=Math.min(1,Math.hypot(x,y)/45),a=Math.atan2(y,x);jx=Math.cos(a)*m;jy=Math.sin(a)*m;jk.style.transform=`translate(${jx*45}px,${jy*45}px)`}
+jo.addEventListener('pointerdown',e=>{jo.setPointerCapture(e.pointerId);jm(e)});
+jo.addEventListener('pointermove',e=>{if(jo.hasPointerCapture(e.pointerId))jm(e)});
+['pointerup','pointercancel'].forEach(t=>jo.addEventListener(t,()=>{jx=jy=0;jk.style.transform=''}));
+$('bj').addEventListener('pointerdown',()=>jump=true);$('be').addEventListener('pointerdown',act);
+if(TOUCH)['joy','bj','be'].forEach(i=>$(i).classList.remove('hidden'));
+
+/* ---------- loop ---------- */
+const hit=(x,z,r)=>cols.some(c=>P.y<c.h-.15&&x+r>c.a&&x-r<c.b&&z+r>c.c&&z-r<c.d);
+const inside=(x,y,z)=>cols.some(c=>y<c.h&&x>c.a&&x<c.b&&z>c.c&&z<c.d);
+const clk=new T.Clock();let t0=0,lastS=-1;
+function tick(){requestAnimationFrame(tick);const dt=Math.min(clk.getDelta(),.05);t0+=dt;
+if(run){tm+=dt;lt+=dt;if(Math.floor(lt)!=lastS){lastS=Math.floor(lt);$('tmr').textContent=fmt(Math.max(0,180-lt))}}
+if(pl){
+if(st=='play'){
+let fx=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+jx,fy=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)-jy;
+const m=Math.hypot(fx,fy);if(m>1){fx/=m;fy/=m}
+const dx=fx*Math.cos(yaw)-fy*Math.sin(yaw),dz=-fx*Math.sin(yaw)-fy*Math.cos(yaw),sp=5*dt*(.7+P.s*.3),r=.4*P.s+.1;
+if(m>.05){const nx=P.x+dx*sp,nz=P.z+dz*sp;if(!hit(nx,P.z,r))P.x=nx;if(!hit(P.x,nz,r))P.z=nz;
+P.x=Math.max(-30,Math.min(30,P.x));P.z=Math.max(-30,Math.min(30,P.z));
+const ty=Math.atan2(dx,dz);let d=ty-pl.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));pl.rotation.y+=d*Math.min(1,dt*12)}
+const u=pl.userData,w=m>.05?Math.sin(t0*10)*.7:0;P.b=m>.05&&P.y==0?Math.abs(Math.sin(t0*10))*.08:0;u.l1.rotation.x=w;u.l2.rotation.x=-w;u.a1.rotation.x=-w;u.a2.rotation.x=w;
+if(jump&&P.y==0)P.vy=8;jump=false;P.vy-=24*dt;P.y=Math.max(0,P.y+P.vy*dt);if(P.y==0)P.vy=0;
+near=null;let bd=3.2;npcs.forEach(n=>{const d=Math.hypot(n.x-P.x,n.z-P.z);if(d<bd){bd=d;near=n}});
+stars.forEach(o=>{if(o.m.visible){o.m.rotation.y=t0*2;o.m.position.y=1+Math.sin(t0*3+o.x)*.15;if(Math.hypot(o.x-P.x,o.z-P.z)<1.2){o.m.visible=false;pk++;bonus+=10;pop(o.x,1,o.z,0xffd23f);sfx('pick');hud()}}});const pr=$('pr');if(near){pr.textContent=(TOUCH?'Ketuk E: ':'Tekan Spasi: ')+near.n;pr.classList.remove('hidden')}else pr.classList.add('hidden')
+}else{jump=false;if(st=='menu'||st=='pick'){yaw=Math.sin(t0*.5)*(st=='pick'?0:.5);pl.userData.a2.rotation.z=2.6+Math.sin(t0*8)*.3}}
+pl.position.set(P.x,P.y+(P.b||0),P.z);const sq=Math.min(.12,Math.abs(P.vy)*.012);pl.scale.set(P.s*(1-sq),P.s*(1+sq),P.s*(1-sq));
+npcs.forEach(n=>{n.g.position.y=Math.sin(t0*2+n.x)*.03;if(n.k){n.k.rotation.y=t0*2;n.k.position.y=2.9+Math.sin(t0*3)*.15}
+{const u=n.g.userData,dx=P.x-n.x,dz=P.z-n.z,c=st=='dlg'&&n==cur,nr=Math.hypot(dx,dz)<6||c;let e=(nr?Math.atan2(dx,dz):n.r)-n.g.rotation.y;e=Math.atan2(Math.sin(e),Math.cos(e));n.g.rotation.y+=e*Math.min(1,dt*(c?10:4));
+const wv=c?.4+Math.sin(t0*3)*.2:nr?2.6+Math.sin(t0*8)*.35:0;u.a2.rotation.z+=(wv-u.a2.rotation.z)*Math.min(1,dt*8);u.a1.rotation.x=Math.sin(t0*1.6+n.x)*.12}});
+cloud.forEach(c=>{c.position.x+=dt*.9;if(c.position.x>60)c.position.x=-60});
+for(let i=PT.length-1;i>=0;i--){const m=PT[i],u=m.userData;u.l-=dt;m.position.x+=u.vx*dt;m.position.y+=u.vy*dt;m.position.z+=u.vz*dt;u.vy-=9*dt;m.scale.setScalar(Math.max(.01,u.l/.7));if(u.l<=0){S.remove(m);PT.splice(i,1)}}
+const tg=new T.Vector3(P.x,P.y+1.5*P.s,P.z),D=st=='menu'?5.4:4+3*P.s;if(st=='menu'){if(innerWidth>700){tg.x-=Math.cos(yaw)*1.8;tg.z+=Math.sin(yaw)*1.8}else tg.y+=1.6}let pos;
+for(let d=D;d>1.2;d-=.4){pos=new T.Vector3(tg.x+Math.sin(yaw)*Math.cos(pit)*d,Math.max(.6,tg.y+Math.sin(pit)*d),tg.z+Math.cos(yaw)*Math.cos(pit)*d);if(!inside(pos.x,pos.y,pos.z))break}
+CAM.position.lerp(pos,.35);CAM.lookAt(tg);
+{const sb=$('sb');if(st=='menu'&&$('ov').querySelector('.logo')){sb.classList.remove('hidden');CAM.updateMatrixWorld();const v=new T.Vector3(P.x,P.y+2.6*P.s,P.z).project(CAM),w=sb.offsetWidth,x=(v.x+1)/2*innerWidth,y=(1-v.y)/2*innerHeight+Math.sin(t0*2)*3,l=Math.max(8,Math.min(innerWidth-w-8,x-w/2));sb.style.left=l+'px';sb.style.top=(y-sb.offsetHeight-14)+'px';sb.lastElementChild.style.left=(x-l)+'px'}else sb.classList.add('hidden')}
+if(st=='dlg'&&cur&&cur.g){CAM.updateMatrixWorld();const dg=$('dlg'),v=new T.Vector3(cur.x,cur.g.position.y+2.5*cur.g.scale.y,cur.z).project(CAM),w=dg.offsetWidth,h=dg.offsetHeight,x=(v.x+1)/2*innerWidth,y=(1-v.y)/2*innerHeight,l=Math.max(8,Math.min(innerWidth-w-8,x-w/2)),t=Math.max(64,Math.min(innerHeight-h-16,y-h-16));dg.style.left=l+'px';dg.style.top=t+'px';$('dtl').style.left=Math.max(20,Math.min(w-20,x-l))+'px'}
+if(PK.length){const D=4+3*P.s,hw=Math.tan(Math.PI/6)*CAM.aspect*D,x=Math.min(hw*.74,6.5),vis=CAM.aspect>1.3&&st=='pick';PK.forEach((c,i)=>{c.visible=vis;c.position.set(P.x+(i?x:-x),Math.abs(Math.sin(t0*3+i*2))*.06,P.z);const u=c.userData;(i?u.a2:u.a1).rotation.z=(i?1:-1)*(2.6+Math.sin(t0*8+i)*.3)})}
+sun.position.set(P.x+15,P.y+28,P.z+10);sun.target.position.set(P.x,0,P.z)}
+R.render(S,CAM)}
+/* ---------- audio ---------- */
+// PLACEHOLDER FILE AUDIO: isi dengan alamat file milik Anda (berlisensi), mis. bgm:['audio/level1.mp3','audio/level2.mp3','audio/level3.mp3','audio/level4.mp3'], sfx:{ok:'audio/benar.mp3'}.
+// Jika dikosongkan (null), game memakai musik dan efek sintetis original buatan Web Audio.
+const AF={bgm:[null,null,null,null],sfx:{}};
+let AC,mg,sg,nb,vM=.6,vS=.7,mut=false,want=0,ct=null,ms=0,mt=0,paused=false;
+const av=()=>{if(AC){mg.gain.setTargetAtTime(mut?0:vM*.5,AC.currentTime,.05);sg.gain.setTargetAtTime(mut?0:vS,AC.currentTime,.05)}$('mu').style.opacity=mut?.5:1};
+function nt(f,t,d,ty,v,o2,at){const o=AC.createOscillator(),g=AC.createGain();o.type=ty;o.frequency.value=f;at=at||.015;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+at);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(o2);o.start(t);o.stop(t+d+.05)}
+function nz(t,d,v,hp,o2){const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=nb;f.type='highpass';f.frequency.value=hp;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(f);f.connect(g);g.connect(o2);s.start(t);s.stop(t+d+.02)}
+function kick(t,o2){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(40,t+.12);g.gain.setValueAtTime(.35,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(g);g.connect(o2);o.start(t);o.stop(t+.25)}
+const CHS=[[[261.6,329.6,392],[220,261.6,329.6],[174.6,220,261.6],[196,246.9,293.7]],[[392,493.9,587.3],[329.6,392,493.9],[261.6,329.6,392],[293.7,370,440]],[[261.6,329.6,392],[196,246.9,293.7],[220,261.6,329.6],[174.6,220,261.6]],[[293.7,370,440],[246.9,293.7,370],[196,246.9,293.7],[220,277.2,329.6]]],
+SCL=[[0,523.25,587.33,659.25,783.99,880,1046.5],[0,784,880,987.8,1175,1319],[0,523.25,587.33,659.25,783.99,880,1046.5],[0,587.3,659.3,740,880,987.8,1175]],
+MPT=[[[3,0,5,4,3,0,2,0],[4,0,5,4,3,0,2,0],[5,0,6,5,4,0,3,0],[4,3,2,0,3,0,0,0]],[[3,4,5,4,3,0,2,3],[4,5,4,3,2,0,3,0],[3,3,4,5,4,3,2,0],[2,3,4,0,5,4,3,0]],[[3,0,5,0,4,0,3,2],[2,0,4,0,3,0,2,1],[3,0,4,5,0,4,3,0],[2,0,3,0,2,3,0,0]],[[4,0,0,0,5,0,3,0],[3,0,0,0,4,0,2,0],[2,0,0,0,3,0,4,0],[3,0,0,0,2,0,1,0]]],BPM=[72,128,118,80];
+function step(i,k,b,t,e,d){const c=CHS[i][b],m=MPT[i][b][k],f=m?SCL[i][m]:0;
+if(i==0){const pn=(fr,du,v)=>{nt(fr,t,du,'sine',v,d,.01);nt(fr*2,t,du*.5,'triangle',v*.3,d,.01)};pn(c[[0,1,2,1,2,1,2,1][k]],e*5,.07);if(k==0)pn(c[0]/2,e*7,.1);if(f&&k%4==0)pn(f,e*4,.1)}
+else if(i==1){if(k%2==0)c.forEach((fr,j)=>nt(fr,t+j*.012,.14,'triangle',.05,d,.004));if(f)nt(f*2,t,.3,'sine',.11,d,.004);nz(t,.04,k%2?.03:.015,6000,d);if(k==4)nt(880,t,.05,'square',.03,d,.002);if(k==0)nt(c[0]/2,t,e*2,'sine',.1,d)}
+else if(i==2){if(k==0||k==4)kick(t,d);if(k%2)nz(t,.05,.04,7000,d);if(k==4)nz(t,.12,.05,2000,d);if([0,3,4,6].includes(k))nt(c[0]/2,t,e*1.6,'triangle',.1,d,.005);if(k==0||k==3)c.forEach(fr=>nt(fr,t,e*1.2,'square',.012,d,.005));if(f)nt(f,t,e*1.5,'triangle',.09,d,.01)}
+else{if(k==0)c.forEach(fr=>nt(fr,t,e*8,'triangle',.035,d,.7));if(k%2==0)nt(c[[0,1,2,1][k/2]]*2,t,e*3,'sine',.05,d,.01);if(f)nt(f,t,e*3.5,'sine',.08,d,.05)}}
+function sched(){if(!AC||!ct||ct.el||paused)return;const e=60/BPM[ct.i]/2;while(mt<AC.currentTime+.4){step(ct.i,ms%8,Math.floor(ms/8)%4,mt,e,ct.g);mt+=e;ms++}}
+function setTrack(i){want=i;if(!AC||(ct&&ct.i==i))return;const t=AC.currentTime;
+if(ct){const o=ct;o.g.gain.cancelScheduledValues(t);o.g.gain.setValueAtTime(o.g.gain.value,t);o.g.gain.linearRampToValueAtTime(0,t+1.2);setTimeout(()=>{if(o.el)o.el.pause()},1400)}
+const g=AC.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+1.2);g.connect(mg);ct={i,g};
+if(AF.bgm[i]){try{const el=new Audio(AF.bgm[i]);el.loop=true;AC.createMediaElementSource(el).connect(g);el.play().catch(()=>{});ct.el=el}catch(e){}}
+ms=0;mt=t+.1}
+function startA(){if(AC){if(AC.state!='running'&&!paused)AC.resume();return}try{navigator.audioSession&&(navigator.audioSession.type='playback')}catch(e){}AC=new(window.AudioContext||window.webkitAudioContext)();mg=AC.createGain();sg=AC.createGain();mg.connect(AC.destination);sg.connect(AC.destination);nb=AC.createBuffer(1,AC.sampleRate*.5,AC.sampleRate);const a=nb.getChannelData(0);for(let j=0;j<a.length;j++)a[j]=Math.random()*2-1;av();AC.resume();setTrack(want);setInterval(sched,100)}
+function pauseM(){if(!AC)return;paused=true;mg.gain.setTargetAtTime(0,AC.currentTime,.08);setTimeout(()=>{if(paused)AC.suspend()},400)}
+function resumeM(){if(!AC||!paused)return;paused=false;AC.resume();mt=AC.currentTime+.1;av()}
+const SF={ok:[[659,0,.15],[880,.1,.25]],bad:[[220,0,.2],[165,.14,.3]],pt:[[1318,0,.12],[1760,.07,.2]],talk:[[520,0,.08],[660,.06,.1]],pick:[[988,0,.1],[1319,.07,.18]],mis:[[523,0,.15],[659,.09,.15],[784,.18,.15],[1047,.27,.3]],lvl:[[523,0,.2],[659,.12,.2],[784,.24,.2],[1047,.36,.2],[1319,.48,.5]],new:[[392,0,.15],[523,.1,.15],[784,.2,.35]],win:[[523,0,.15],[523,.15,.15],[523,.3,.15],[659,.45,.25],[784,.7,.2],[659,.9,.15],[784,1.05,.2],[1047,1.3,.6]]};
+function sfx(n,d){if(AF.sfx[n]){try{const a=new Audio(AF.sfx[n]);a.volume=mut?0:vS;setTimeout(()=>a.play().catch(()=>{}),(d||0)*1e3)}catch(e){}return}
+if(!AC||paused)return;const t=AC.currentTime+(d||0);(SF[n]||[]).forEach(a=>nt(a[0],t+a[1],a[2],'triangle',.12,sg))}
+['pointerdown','touchend','click','keydown'].forEach(ev=>addEventListener(ev,startA,{once:true}));
+let rotX=0;function chkRot(){$('rot').classList.toggle('hidden',!(TOUCH&&!rotX&&innerWidth<700&&innerHeight>innerWidth))}
+addEventListener('resize',chkRot);addEventListener('orientationchange',chkRot);chkRot();
+if(TOUCH){$('dlg').querySelector('button').textContent='Lanjut';LV[0].story=LV[0].story.replace('tekan Spasi di dekatnya','ketuk tombol E di dekatnya')}
+load(-1,pick);tick();
+</script></body></html>
